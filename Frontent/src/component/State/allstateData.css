@@ -1,0 +1,168 @@
+.states-container {
+    padding: 55px 12px 70px
+}
+
+.states-heading {
+    text-align: center;
+    margin-bottom: 42px
+}
+
+.states-heading p {
+    margin: 0 0 7px;
+    color: #e89b00;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 3px
+}
+
+.states-heading h2 {
+    margin: 0;
+    color: #172b4d;
+    font-size: 34px;
+    font-weight: 800
+}
+
+.states-heading span {
+    display: block;
+    margin: 10px auto 0;
+    color: #777;
+    font-size: 14px;
+    max-width: 600px
+}
+
+.state-box {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, .09);
+    transition: .25s;
+    border: 1px solid #eee
+}
+
+.state-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .14)
+}
+
+.state-box-top {
+    height: 78px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+.state-box-top small {
+    font-size: 9px;
+    color: #e89b00;
+    font-weight: 800;
+    letter-spacing: 2px
+}
+
+.state-box-top h3 {
+    margin: 2px 0 0;
+    color: #172b4d;
+    font-size: 22px;
+    font-weight: 800
+}
+
+.place-count {
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: #fff5dc;
+    color: #d98c00;
+    font-size: 12px;
+    font-weight: 700
+}
+
+.state-place-image {
+    height: 285px;
+    position: relative
+}
+
+.state-place-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover
+}
+
+.place-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: 22px;
+    background: linear-gradient(transparent 35%, rgba(0, 0, 0, .75));
+    color: #fff
+}
+
+.place-overlay h4 {
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0 0 4px
+}
+
+.place-overlay p {
+    margin: 0;
+    font-size: 13px;
+    color: #eee
+}
+
+.state-box-bottom {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px
+}
+
+.state-box-bottom span {
+    color: #777;
+    font-size: 13px
+}
+
+.state-box-bottom button {
+    border: 0;
+    background: #f0a500;
+    color: #fff;
+    border-radius: 9px;
+    padding: 9px 15px;
+    font-size: 13px;
+    font-weight: 700
+}
+
+.state-box-bottom button:hover {
+    background: #d99000
+}
+
+.state-box-bottom b {
+    font-size: 17px;
+    margin-left: 3px
+}
+
+@media(max-width:767px) {
+    .states-container {
+        padding-top: 35px
+    }
+
+    .states-heading h2 {
+        font-size: 27px
+    }
+
+    .state-place-image {
+        height: 235px
+    }
+
+    .state-box-bottom {
+        align-items: stretch;
+        flex-direction: column
+    }
+
+    .state-box-bottom button {
+        width: 100%
+    }
+
+    .state-box-top h3 {
+        font-size: 19px
+    }
+}

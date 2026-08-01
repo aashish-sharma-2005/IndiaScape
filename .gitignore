@@ -1,0 +1,10 @@
+﻿Backend/node_modules/
+Frontent/node_modules/
+
+Backend/.env
+Frontent/.env
+
+dist/
+build/
+.vscode/
+*.log

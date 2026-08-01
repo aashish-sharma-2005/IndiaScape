@@ -1,0 +1,179 @@
+.india-footer {
+    width: 100%;
+
+    background:
+        linear-gradient(
+            rgba(101, 39, 10, 0.96),
+            rgba(68, 26, 7, 0.99)
+        );
+
+    color: #f6dfae;
+
+    border-top: 5px solid #9a481d;
+
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+/* ================= FOOTER TOP ================= */
+
+.footer-top {
+    min-height: 80px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 5%;
+}
+
+/* ================= SOCIAL ================= */
+
+.social-section {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+.social-icons {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+.social-icons span {
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    background: #eeeeee;
+
+    color: #345b94;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-family: Arial, sans-serif;
+
+    font-weight: bold;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+}
+
+.social-icons span:hover {
+    transform: translateY(-3px);
+
+    background: white;
+}
+
+/* ================= FOOTER LINKS ================= */
+
+.footer-links {
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+}
+
+.footer-links a {
+    color: #f6dfae;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+}
+
+.footer-links i {
+    width: 1px;
+
+    height: 22px;
+
+    background: #d7b67b;
+
+    display: block;
+}
+
+/* ================= FOOTER BOTTOM ================= */
+
+.footer-bottom {
+    border-top:
+        1px solid rgba(255, 255, 255, 0.18);
+
+    text-align: center;
+
+    padding: 15px;
+
+    font-size: 17px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+    .footer-top {
+        flex-direction: column;
+
+        gap: 20px;
+
+        padding: 20px;
+    }
+
+    .footer-links {
+        justify-content: center;
+
+        flex-wrap: wrap;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .social-section {
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .footer-links {
+        gap: 10px;
+
+        font-size: 14px;
+    }
+
+    .footer-links i {
+        height: 18px;
+    }
+
+    .footer-bottom {
+        font-size: 14px;
+    }
+
+}

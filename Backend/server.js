@@ -1,0 +1,20 @@
+const express = require("express")
+const cors = require("cors")
+const dotenv = require("dotenv")
+const ConnectDB = require("./Config/ConnectDb")
+const cookieParser = require("cookie-parser")
+const {UserLogin,CurrentUser,AdminOnly,UserOnly} = require("./Midleware/Auth")
+const app = express()
+dotenv.config()
+ConnectDB()
+app.use(cors({origin: "http://localhost:5173",credentials: true}))
+app.use(cookieParser())
+app.use(express.json())
+
+app.use('/',require('./Routes/Auth/Auth'))
+app.use('/admin',UserLogin,AdminOnly,require("./Routes/Admin/admin"))
+app.use('/dashboard',UserLogin,UserOnly,require("./Routes/Dashboard/Dashboard"))
+
+app.get('/me',UserLogin,CurrentUser)
+
+app.listen(3000,()=>console.log("Backend Start"))

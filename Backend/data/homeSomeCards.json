@@ -1,0 +1,74 @@
+[
+    {
+        "id": 174,
+        "state_id": 19,
+        "name": "Jagannath Temple",
+        "title": "The Holy Citadel of Puri Rath Yatra",
+        "description": "A highly sacred coastal temple complex dedicated to Lord Jagannath, globally famous for its monumental annual Chariot Festival.",
+        "image_urls": [
+            "https://images.unsplash.com/photo-1605713437754-048705b68df6",
+            "https://images.unsplash.com/photo-1601058334468-b328a2a7f5cf",
+            "https://images.unsplash.com/photo-1544735716-392fe2489ffa"
+        ]
+    },
+    {
+        "id": 113,
+        "state_id": 4,
+        "name": "Mahabodhi Temple",
+        "title": "The Cradle of Buddhist Enlightenment",
+        "description": "Located in Bodh Gaya, this ancient pyramidal stone temple marks the exact location where Siddhartha Gautama sat beneath the sacred Bodhi Tree and became the Buddha.",
+        "image_urls": [
+            "https://images.unsplash.com/photo-1622549051833-2a3a5fbf5c5d",
+            "https://images.unsplash.com/photo-1548013146-72479768bada",
+            "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1"
+        ]
+    },
+    {
+        "id": 125,
+        "state_id": 7,
+        "name": "Statue of Unity",
+        "title": "The Tallest Statue in the World",
+        "description": "Standing at an engineering height of 182 meters, this colossal monument honors visionary statesman Sardar Vallabhbhai Patel.",
+        "image_urls": [
+            "https://images.unsplash.com/photo-1605649487212-47bdab064df7",
+            "https://images.unsplash.com/photo-1534447677768-be436bb09401",
+            "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab"
+        ]
+    },
+    {
+        "id": 129,
+        "state_id": 8,
+        "name": "Jyotisar Kurukshetra",
+        "title": "The Birthplace of the Bhagavad Gita",
+        "description": "A deeply revered historical site featuring a holy ancient Banyan tree, where Lord Krishna delivered his timeless cosmic sermon to Prince Arjuna.",
+        "image_urls": [
+            "https://images.unsplash.com/photo-1609137144813-8994747eb108",
+            "https://images.unsplash.com/photo-1601058334468-b328a2a7f5cf",
+            "https://images.unsplash.com/photo-1544735716-392fe2489ffa"
+        ]
+    },
+    {
+        "id": 132,
+        "state_id": 8,
+        "name": "Morni Hills",
+        "title": "The Lone Scenic Hill Station of Haryana",
+        "description": "A peaceful offshoot of the Shivalik hill range, hosting rich greenery, twin interconnected holy lakes, and historic fort ramparts.",
+        "image_urls": [
+            "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+            "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+            "https://images.unsplash.com/photo-1519681393784-d120267933ba"
+        ]
+    },
+    {
+        "id": 158,
+        "state_id": 15,
+        "name": "Kangla Fort",
+        "title": "The Historic Royal Palace of Imphal",
+        "description": "An ancient fortified palace complex that served as the traditional seat of power for the Meitei rulers of the Kingdom of Manipur.",
+        "image_urls": [
+            "https://images.unsplash.com/photo-1570168007204-dfb528c6958f",
+            "https://images.unsplash.com/photo-1564507592333-c60657eea523",
+            "https://images.unsplash.com/photo-1544735716-392fe2489ffa"
+        ]
+    }
+]

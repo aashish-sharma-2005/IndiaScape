@@ -1,0 +1,98 @@
+[
+  {
+    "id": 301,
+    "state_id": 9,
+    "name": "Triund",
+    "title": "The Panoramic Ridge of Dhauladhar",
+    "description": "A breathtaking trekking destination near McLeod Ganj, offering stunning views of the Dhauladhar mountain range, lush meadows, and unforgettable sunrises.",
+    "image_urls": [
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba"
+    ]
+  },
+  {
+    "id": 302,
+    "state_id": 27,
+    "name": "Auli",
+    "title": "India's Snow Paradise",
+    "description": "A famous Himalayan hill station known for snow-covered peaks, skiing adventures, ropeway rides, and spectacular views of Nanda Devi.",
+    "image_urls": [
+      "https://images.unsplash.com/photo-1454496522488-7a8e488e8606",
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+    ]
+  },
+  {
+    "id": 303,
+    "state_id": 12,
+    "name": "Munnar View Point",
+    "title": "Rolling Tea Hills and Misty Peaks",
+    "description": "One of Kerala's most scenic viewpoints, surrounded by endless tea gardens, cool weather, winding roads, and breathtaking sunrise views.",
+    "image_urls": [
+      "https://images.unsplash.com/photo-1599661046289-e31897846e41",
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b"
+    ]
+  },
+  {
+    "id": 304,
+    "state_id": 22,
+    "name": "Pelling",
+    "title": "Gateway to Mount Kanchenjunga",
+    "description": "A peaceful hill town in Sikkim famous for crystal-clear views of Mount Kanchenjunga, monasteries, waterfalls, and skywalk adventures.",
+    "image_urls": [
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+      "https://images.unsplash.com/photo-1454496522488-7a8e488e8606",
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+    ]
+  },
+  {
+    "id": 305,
+    "state_id": 16,
+    "name": "Laitlum Canyon",
+    "title": "The Endless Valley Viewpoint",
+    "description": "A hidden gem in Meghalaya offering dramatic cliffs, deep valleys, floating clouds, and one of the most mesmerizing panoramic views in Northeast India.",
+    "image_urls": [
+      "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+    ]
+  },
+  {
+    "id": 306,
+    "state_id": 9,
+    "name": "Kasol",
+    "title": "The Mini Israel of India",
+    "description": "Nestled along the Parvati River, Kasol is famous for pine forests, mountain cafés, trekking routes, and breathtaking Himalayan landscapes.",
+    "image_urls": [
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b"
+    ]
+  },
+  {
+    "id": 307,
+    "state_id": 27,
+    "name": "Chopta",
+    "title": "The Mini Switzerland of Uttarakhand",
+    "description": "A beautiful alpine destination surrounded by dense forests and snow-capped Himalayan peaks, serving as the base for the Tungnath trek.",
+    "image_urls": [
+      "https://images.unsplash.com/photo-1454496522488-7a8e488e8606",
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba"
+    ]
+  },
+  {
+    "id": 308,
+    "state_id": 21,
+    "name": "Mount Abu Sunset Point",
+    "title": "The Best Sunset View of Rajasthan",
+    "description": "A spectacular viewpoint overlooking the Aravalli Hills, famous for colorful sunsets, cool climate, and panoramic valley scenery.",
+    "image_urls": [
+      "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+    ]
+  }
+]

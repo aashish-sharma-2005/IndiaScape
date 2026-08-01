@@ -1,0 +1,180 @@
+.not-found-page {
+  min-height: calc(100vh - 150px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 20px;
+
+  background: #f8f1df;
+
+  box-sizing: border-box;
+}
+
+
+/* Content */
+
+.not-found-content {
+  width: 100%;
+  max-width: 520px;
+
+  text-align: center;
+
+  margin-top: -25px;
+}
+
+
+/* Small Error Label */
+
+.not-found-label {
+  display: inline-block;
+
+  margin-bottom: 14px;
+
+  color: #9a3516;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+}
+
+
+/* Heading */
+
+.not-found-content h1 {
+  margin: 0;
+
+  color: #35251b;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 42px;
+
+  line-height: 1.15;
+
+  font-weight: 700;
+}
+
+
+/* Description */
+
+.not-found-content p {
+  max-width: 440px;
+
+  margin: 14px auto 25px;
+
+  color: #756253;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 15px;
+
+  line-height: 1.6;
+}
+
+
+/* Buttons */
+
+.not-found-actions {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+}
+
+
+/* Primary */
+
+.not-found-primary {
+  padding: 10px 20px;
+
+  color: #fff;
+
+  background: #963313;
+
+  border: 1px solid #963313;
+
+  border-radius: 4px;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition: 0.2s ease;
+}
+
+.not-found-primary:hover {
+  background: #7f290f;
+
+  border-color: #7f290f;
+}
+
+
+/* Secondary */
+
+.not-found-secondary {
+  padding: 10px 20px;
+
+  color: #7e351e;
+
+  background: transparent;
+
+  border: 1px solid #b98c68;
+
+  border-radius: 4px;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.not-found-secondary:hover {
+  color: #963313;
+
+  background: #f1e2c4;
+
+  border-color: #963313;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .not-found-content h1 {
+    font-size: 34px;
+  }
+
+  .not-found-content p {
+    font-size: 14px;
+
+    padding: 0 10px;
+  }
+
+  .not-found-actions {
+    flex-direction: column;
+  }
+
+  .not-found-primary,
+  .not-found-secondary {
+    width: 180px;
+
+    text-align: center;
+  }
+}
