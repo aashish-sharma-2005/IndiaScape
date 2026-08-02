@@ -1,8 +1,8 @@
-import './App.css'
+import './App.css';
 import { useEffect, useState } from "react";
 import { TopNavBar } from "./screen/Navbar/index";
 import { HomeHeroPage } from "./screen/HeroPage/index";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Login } from "./screen/Auth/Login";
 import { Signup } from "./screen/Auth/Signup";
 import { VerifyOtp } from "./screen/Auth/VerifyOtp";
@@ -20,11 +20,20 @@ import { OneStateData } from "./component/State/OneStateData";
 import AdminStates from "./component/Admin/AdminStates";
 import { Details } from "./screen/Details";
 import Footer from "./screen/Navbar/Footer";
-import NotFound from './screen/NotFound';
+import NotFound from './screen/NotFound/index'
 
 function App() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
+
+  const location = useLocation();
+
+  const isAdmin = location.pathname.startsWith("/admin");
+
+  const isAuthPage =
+    location.pathname === "/login" ||
+    location.pathname === "/signup" ||
+    location.pathname === "/verify-otp";
 
   useEffect(() => {
     const getUser = async () => {
@@ -54,22 +63,33 @@ function App() {
     getUser();
   }, [dispatch]);
 
-  if (loading) return <Loading />;
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
-    <div className="app-layout">
+    <div className="app-shell">
 
-      {/* Fixed / Top Header */}
-      <TopNavBar />
+      {/* HEADER */}
+      {!isAdmin && <TopNavBar />}
 
-      {/* Middle Content */}
-      <main className="app-main">
+      {/* PAGE CONTENT */}
+      <main
+        className={`app-main ${
+          isAdmin ? "admin-main" : ""
+        } ${
+          isAuthPage ? "auth-main" : ""
+        }`}
+      >
         <Routes>
+
+          {/* HOME */}
           <Route
             path="/"
             element={<HomeHeroPage />}
           />
 
+          {/* AUTH */}
           <Route
             path="/login"
             element={<Login />}
@@ -85,6 +105,7 @@ function App() {
             element={<VerifyOtp />}
           />
 
+          {/* USER */}
           <Route
             path="/dashboard"
             element={
@@ -121,6 +142,7 @@ function App() {
             }
           />
 
+          {/* ADMIN */}
           <Route
             path="/admin"
             element={
@@ -130,19 +152,27 @@ function App() {
             }
           >
             <Route index element={<Admin />} />
-            <Route path="places" element={<AdminPlaces />} />
-            <Route path="states" element={<AdminStates />} />
+            <Route
+              path="places"
+              element={<AdminPlaces />}
+            />
+            <Route
+              path="states"
+              element={<AdminStates />}
+            />
           </Route>
 
+          {/* 404 */}
           <Route
             path="*"
             element={<NotFound />}
           />
+
         </Routes>
       </main>
 
-      {/* Bottom Footer */}
-      <Footer />
+      {/* FOOTER */}
+      {!isAdmin && <Footer />}
 
     </div>
   );

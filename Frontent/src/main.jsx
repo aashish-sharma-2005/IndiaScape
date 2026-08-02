@@ -2,19 +2,24 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
-import { ToastContainer, } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import loginReducer from './store/loginSlice.js'
+import loginReducer from "./store/loginSlice.js";
+import placeReducer from "./store/placesSlice.js";
+
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
+
 const store = configureStore({
-  reducer: { loginReducer }
-})
+  reducer: {
+    loginReducer: loginReducer,
+    places: placeReducer,
+  },
+});
+
 createRoot(document.getElementById("root")).render(
-
   <StrictMode>
-
     <BrowserRouter>
       <Provider store={store}>
         <App />
@@ -28,9 +33,6 @@ createRoot(document.getElementById("root")).render(
         pauseOnHover
         theme="light"
       />
-
     </BrowserRouter>
-
   </StrictMode>
-
 );

@@ -5,6 +5,8 @@
 .site-header {
   width: 100%;
   height: 78px;
+
+  margin: 0;
   padding: 0 55px;
 
   box-sizing: border-box;
@@ -25,6 +27,8 @@
 
   position: relative;
   z-index: 1000;
+
+  flex-shrink: 0;
 }
 
 
@@ -39,6 +43,9 @@
   align-items: center;
 
   gap: 10px;
+
+  margin: 0;
+  padding: 0;
 
   text-decoration: none;
 }
@@ -76,6 +83,8 @@
 
   box-shadow:
     0 2px 5px rgba(0, 0, 0, 0.25);
+
+  flex-shrink: 0;
 }
 
 .logo-icon span:nth-child(1) {
@@ -96,7 +105,7 @@
 
 
 /* =========================================
-   CENTER NAVIGATION
+   NAVIGATION
 ========================================= */
 
 .header-nav {
@@ -106,6 +115,9 @@
   align-items: center;
 
   gap: 34px;
+
+  margin: 0;
+  padding: 0;
 }
 
 .header-nav a {
@@ -115,6 +127,9 @@
   align-items: center;
 
   position: relative;
+
+  margin: 0;
+  padding: 0;
 
   color: #41291b;
 
@@ -138,7 +153,7 @@
 
 
 /* =========================================
-   ACTIVE NAVIGATION
+   ACTIVE
 ========================================= */
 
 .header-nav a.active {
@@ -164,7 +179,7 @@
 
 
 /* =========================================
-   LOGIN / SIGNUP BUTTONS
+   LOGIN / SIGNUP
 ========================================= */
 
 .header-actions {
@@ -175,11 +190,20 @@
   justify-content: flex-end;
 
   gap: 12px;
+
+  margin: 0;
+  padding: 0;
 }
 
 .header-login,
 .header-signup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   padding: 9px 18px;
+
+  margin: 0;
 
   border-radius: 4px;
 
@@ -192,9 +216,6 @@
 
   transition: all 0.2s ease;
 }
-
-
-/* Login */
 
 .header-login {
   color: #963315;
@@ -209,9 +230,6 @@
 
   background: #963315;
 }
-
-
-/* Signup */
 
 .header-signup {
   color: #fff;
@@ -232,7 +250,7 @@
 
 
 /* =========================================
-   LOGIN / SIGNUP PAGE HEADER
+   AUTH HEADER
 ========================================= */
 
 .auth-header {
@@ -266,7 +284,7 @@
 
 
 /* =========================================
-   LOGGED-IN USER HEADER
+   LOGGED-IN HEADER
 ========================================= */
 
 .user-header {
@@ -291,6 +309,9 @@
 
   display: flex;
   justify-content: flex-end;
+
+  margin: 0;
+  padding: 0;
 }
 
 
@@ -305,6 +326,7 @@
   gap: 9px;
 
   padding: 6px 0;
+  margin: 0;
 
   color: #3e291d;
 
@@ -326,7 +348,7 @@
 
 
 /* =========================================
-   USER AVATAR
+   AVATAR
 ========================================= */
 
 .user-avatar {
@@ -352,7 +374,7 @@
 
 
 /* =========================================
-   DROPDOWN ARROW
+   ARROW
 ========================================= */
 
 .arrow {
@@ -369,7 +391,7 @@
 
 
 /* =========================================
-   USER DROPDOWN
+   DROPDOWN
 ========================================= */
 
 .user-dropdown {
@@ -392,9 +414,6 @@
     0 6px 18px rgba(65, 35, 15, 0.25);
 }
 
-
-/* Dropdown Links + Buttons */
-
 .user-dropdown a,
 .user-dropdown button {
   width: 100%;
@@ -404,6 +423,8 @@
   box-sizing: border-box;
 
   padding: 12px 16px;
+
+  margin: 0;
 
   color: #4a3020;
 
@@ -431,7 +452,7 @@
 
 
 /* =========================================
-   RESPONSIVE
+   TABLET
 ========================================= */
 
 @media (max-width: 1100px) {
@@ -464,14 +485,13 @@
 
 
 /* =========================================
-   TABLET
+   SMALL TABLET
 ========================================= */
 
 @media (max-width: 850px) {
 
   .site-header {
     height: auto;
-
     min-height: 75px;
 
     padding: 12px 20px;
@@ -485,7 +505,6 @@
     order: 3;
 
     width: 100%;
-
     height: 45px;
 
     justify-content: center;

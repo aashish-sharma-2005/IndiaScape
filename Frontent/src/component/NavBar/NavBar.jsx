@@ -8,24 +8,21 @@ const NavBar = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { user, isLogin } = useSelector(
-    (state) => state.loginReducer
-  );
+ const { isLogin, user } = useSelector(
+  (state) => state.loginReducer
+);
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const path = location.pathname.toLowerCase();
 
-  // =========================
-  // ADMIN -> NO HEADER
-  // =========================
-
+  // ADMIN PAGES -> NO HEADER
   if (user?.role === "admin" || path.startsWith("/admin")) {
     return null;
   }
 
   // =========================
-  // HERO PAGE
+  // PUBLIC HOME / HERO
   // =========================
 
   const isHeroPage = path === "/" || path === "/home";
@@ -71,7 +68,7 @@ const NavBar = () => {
   }
 
   // =========================
-  // LOGIN PAGE
+  // LOGIN
   // =========================
 
   if (path === "/login") {
@@ -80,7 +77,8 @@ const NavBar = () => {
         <Logo />
 
         <div className="auth-link">
-          Don't have an account?
+          <span>Don't have an account?</span>
+
           <Link to="/signup">
             Sign Up
           </Link>
@@ -90,7 +88,7 @@ const NavBar = () => {
   }
 
   // =========================
-  // SIGNUP PAGE
+  // SIGNUP
   // =========================
 
   if (path === "/signup") {
@@ -99,7 +97,8 @@ const NavBar = () => {
         <Logo />
 
         <div className="auth-link">
-          Already have an account?
+          <span>Already have an account?</span>
+
           <Link to="/login">
             Login
           </Link>
@@ -109,40 +108,46 @@ const NavBar = () => {
   }
 
   // =========================
-  // LOGGED-IN USER HEADER
+  // LOGGED-IN USER
   // =========================
 
   if (isLogin) {
     return (
       <header className="site-header user-header">
 
-        {/* LOGO */}
         <Logo />
 
-        {/* CENTER NAVIGATION */}
         <nav className="header-nav user-nav">
 
           <Link
-            className={path === "/home" ? "active" : ""}
-            to="/home"
+            className={
+              path === "/home" || path === "/dashboard"
+                ? "active"
+                : ""
+            }
+            to="/dashboard"
           >
             Home
           </Link>
 
           <Link
-            className={path.startsWith("/states") ? "active" : ""}
-            to="/states"
+            className={
+              path.startsWith("/dashboard/states")
+                ? "active"
+                : ""
+            }
+            to="/dashboard/states"
           >
             States
           </Link>
 
           <Link
             className={
-              path.startsWith("/famous-places")
+              path.startsWith("/dashboard/place")
                 ? "active"
                 : ""
             }
-            to="/famous-places"
+            to="/dashboard"
           >
             Famous Places
           </Link>
@@ -160,16 +165,13 @@ const NavBar = () => {
 
         </nav>
 
-        {/* USER */}
         <div className="user-menu">
 
           <button
+            type="button"
             className="username-button"
-            onClick={() =>
-              setDropdownOpen(!dropdownOpen)
-            }
+            onClick={() => setDropdownOpen((prev) => !prev)}
           >
-
             <span className="user-avatar">
               {getUsername(user)
                 .charAt(0)
@@ -187,23 +189,20 @@ const NavBar = () => {
             >
               ▼
             </span>
-
           </button>
 
-          {/* DROPDOWN */}
           {dropdownOpen && (
             <div className="user-dropdown">
 
               <Link
                 to="/profile"
-                onClick={() =>
-                  setDropdownOpen(false)
-                }
+                onClick={() => setDropdownOpen(false)}
               >
                 Profile
               </Link>
 
               <button
+                type="button"
                 onClick={() => {
                   dispatch(logout());
                   setDropdownOpen(false);
@@ -221,7 +220,10 @@ const NavBar = () => {
     );
   }
 
-  // Agar kisi unknown page par logged out hai
+  // =========================
+  // UNKNOWN PUBLIC PAGE
+  // =========================
+
   return (
     <header className="site-header">
       <Logo />
@@ -240,14 +242,13 @@ const NavBar = () => {
 };
 
 
-// =========================
+// =========================================
 // LOGO
-// =========================
+// =========================================
 
 const Logo = () => {
   return (
     <Link to="/" className="logo">
-
       <div className="logo-icon">
         <span></span>
         <span></span>
@@ -258,18 +259,19 @@ const Logo = () => {
       <span className="logo-text">
         IndiaScape
       </span>
-
     </Link>
   );
 };
 
 
-// =========================
-// USERNAME HELPER
-// =========================
+// =========================================
+// USERNAME
+// =========================================
 
 const getUsername = (user) => {
-  if (!user) return "User";
+  if (!user) {
+    return "User";
+  }
 
   return (
     user.username ||

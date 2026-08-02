@@ -1,30 +1,46 @@
-import { useEffect, useState } from "react"
-import { Home } from "../../component/Home"
-import { useNavigate } from "react-router-dom"
-
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { Home } from "../../component/Home";
+import { setPlaces, setLoading } from "../../store/placesSlice";
 
 export function HomePage() {
-    const navigate = useNavigate()
-    // const [sliderData,setSliderData] = useState([])
-    // const [someCardsData,setSomeCardsData] = useState([])
-    // useEffect(()=>{
-    //     const getData = async ()=>{
-    //         try {
-    //             const response = await fetch('http://localhost:3000/dashboard',{
-    //                 method:"GET",
-    //                 credentials: "include"
-    //             })
-    //             const result = await response.json()
-    //             if(response.status == 401) return navigate('/login')
-    //         } catch (error) {
-    //             console.log(error)
-    //         }
-    //     }
-    //     getData()
-    // },[])
-    return (
-        <>
-            <Home />
-        </>
-    )
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+
+        const getFeaturedPlaces = async () => {
+
+            try {
+
+                dispatch(setLoading(true));
+
+                const response = await fetch(
+                    "http://localhost:3000/dashboard",
+                    {
+                        method: "GET",
+                        credentials: "include"
+                    }
+                );
+
+                const result = await response.json();
+
+                dispatch(setPlaces(result.featuredPlaces));
+
+            } catch (error) {
+
+                console.log(error);
+
+            } finally {
+
+                dispatch(setLoading(false));
+
+            }
+        };
+
+        getFeaturedPlaces();
+
+    }, [dispatch]);
+
+    return <Home />;
 }

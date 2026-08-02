@@ -15,13 +15,13 @@ body,
   padding: 0;
 }
 
-
-/* =========================================
-   BODY
-========================================= */
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   margin: 0;
+  padding: 0;
 
   font-family:
     Arial,
@@ -29,78 +29,63 @@ body {
     sans-serif;
 
   background: #f8f1df;
-
   color: #3d291d;
+
+  overflow-x: hidden;
 }
 
 
 /* =========================================
-   MAIN APP LAYOUT
+   APP SHELL
 ========================================= */
 
-.app-layout {
+.app-shell {
+  width: 100%;
   min-height: 100vh;
 
   display: flex;
   flex-direction: column;
+
+  background: #f8f1df;
 }
 
 
 /* =========================================
-   TOP HEADER
-========================================= */
-
-.app-layout > header {
-  flex-shrink: 0;
-
-  position: sticky;
-  top: 0;
-
-  z-index: 1000;
-}
-
-
-/* =========================================
-   MIDDLE CONTENT
+   MAIN CONTENT
 ========================================= */
 
 .app-main {
-  flex: 1;
-
   width: 100%;
+
+  flex: 1;
 
   min-height: 0;
 
   position: relative;
+
+  /* IMPORTANT:
+     Header normal document flow me hai.
+     Isliye yahan padding-top NAHI hoga.
+  */
+  padding: 0;
 }
 
 
 /* =========================================
-   ROUTES CONTENT
+   ADMIN MAIN
+========================================= */
+
+.admin-main {
+  padding: 0;
+}
+
+
+/* =========================================
+   ROUTE CONTENT
 ========================================= */
 
 .app-main > * {
   width: 100%;
-}
-
-
-/* =========================================
-   FOOTER
-========================================= */
-
-.app-layout > footer {
-  flex-shrink: 0;
-
-  width: 100%;
-}
-
-
-/* =========================================
-   LINKS
-========================================= */
-
-a {
-  color: inherit;
 }
 
 
@@ -115,13 +100,31 @@ img {
 
 
 /* =========================================
+   LINKS
+========================================= */
+
+a {
+  color: inherit;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.app-shell > footer {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+
+/* =========================================
    MOBILE
 ========================================= */
 
 @media (max-width: 768px) {
-
   .app-main {
     width: 100%;
+    padding: 0;
   }
-
 }
