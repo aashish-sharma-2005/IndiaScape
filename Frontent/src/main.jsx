@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import loginReducer from "./store/loginSlice.js";
 import placeReducer from "./store/placesSlice.js";
+import statesReducer from './store/statesSlice.js'
 
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
@@ -15,6 +16,7 @@ const store = configureStore({
   reducer: {
     loginReducer: loginReducer,
     places: placeReducer,
+    states: statesReducer,
   },
 });
 

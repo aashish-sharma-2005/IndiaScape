@@ -1,45 +1,37 @@
 import { AllStateData } from "../../component/State/AllStateData";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Loading from "../Loading/";
+import { fetchStatesData } from "../../store/statesSlice";
 
 export function States() {
     const navigate = useNavigate();
-    const [famous, setFamous] = useState([]);
-    const [states, setStates] = useState([]);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
+
+    const { loading, error } = useSelector(
+        (state) => state.states
+    );
 
     useEffect(() => {
-        const getData = async () => {
-            try {
-                const response = await fetch("http://localhost:3000/dashboard/states", {
-                    method: "GET",
-                    credentials: "include"
-                });
-                const result = await response.json();
-                if (response.status === 401) return navigate("/login");
-                if (!response.ok || !result.status) {
-                    setError(result.message || "Something went wrong");
-                    return;
-                }
-                setFamous(result.places || []);
-                setStates(result.states || []);
-            } catch (error) {
-                console.log(error);
-                setError("Server Error");
-            } finally {
-                setLoading(false);
-            }
-        };
-        getData();
-    }, [navigate]);
+        dispatch(fetchStatesData());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (error === "Unauthorized") {
+            navigate("/login");
+        }
+    }, [error, navigate]);
 
     if (loading) return <Loading />;
 
-    return error ? (
-        <h3 className="text-center text-danger mt-5">{error}</h3>
-    ) : (
-        <AllStateData famous={famous} states={states} />
-    );
+    if (error) {
+        return (
+            <h3 className="text-center text-danger mt-5">
+                {error}
+            </h3>
+        );
+    }
+
+    return <AllStateData />;
 }
