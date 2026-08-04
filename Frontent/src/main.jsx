@@ -17,7 +17,7 @@ const store = configureStore({
     loginReducer: loginReducer,
     places: placeReducer,
     states: statesReducer,
-  },
+}
 });
 
 createRoot(document.getElementById("root")).render(

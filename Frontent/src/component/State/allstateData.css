@@ -1,168 +1,62 @@
-.states-container {
-    padding: 55px 12px 70px
+.simple-states {
+    padding: 50px;
 }
 
-.states-heading {
-    text-align: center;
-    margin-bottom: 42px
+.simple-states h2 {
+    margin-bottom: 25px;
+    font-size: 28px;
 }
 
-.states-heading p {
-    margin: 0 0 7px;
-    color: #e89b00;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 3px
+.states-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
 }
 
-.states-heading h2 {
-    margin: 0;
-    color: #172b4d;
-    font-size: 34px;
-    font-weight: 800
-}
-
-.states-heading span {
-    display: block;
-    margin: 10px auto 0;
-    color: #777;
-    font-size: 14px;
-    max-width: 600px
-}
-
-.state-box {
-    background: #fff;
-    border-radius: 18px;
+.state-card {
+    position: relative;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, .09);
-    transition: .25s;
-    border: 1px solid #eee
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    transition: 0.3s;
 }
 
-.state-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, .14)
+.state-card:hover {
+    transform: translateY(-5px) scale(1.02);
 }
 
-.state-box-top {
-    height: 78px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between
-}
-
-.state-box-top small {
-    font-size: 9px;
-    color: #e89b00;
-    font-weight: 800;
-    letter-spacing: 2px
-}
-
-.state-box-top h3 {
-    margin: 2px 0 0;
-    color: #172b4d;
-    font-size: 22px;
-    font-weight: 800
-}
-
-.place-count {
-    padding: 7px 12px;
-    border-radius: 20px;
-    background: #fff5dc;
-    color: #d98c00;
-    font-size: 12px;
-    font-weight: 700
-}
-
-.state-place-image {
-    height: 285px;
-    position: relative
-}
-
-.state-place-image img {
+.state-card img {
     width: 100%;
-    height: 100%;
-    object-fit: cover
+    height: 220px;
+    object-fit: cover;
 }
 
-.place-overlay {
+.card-overlay {
     position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: flex-end;
-    padding: 22px;
-    background: linear-gradient(transparent 35%, rgba(0, 0, 0, .75));
-    color: #fff
+    bottom: 0;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.85),
+        transparent
+    );
+    color: white;
+    text-align: center;
 }
 
-.place-overlay h4 {
-    font-size: 24px;
-    font-weight: 800;
-    margin: 0 0 4px
+.card-overlay h3 {
+    margin-bottom: 8px;
+    font-size: 18px;
 }
 
-.place-overlay p {
-    margin: 0;
-    font-size: 13px;
-    color: #eee
-}
-
-.state-box-bottom {
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px
-}
-
-.state-box-bottom span {
-    color: #777;
-    font-size: 13px
-}
-
-.state-box-bottom button {
-    border: 0;
-    background: #f0a500;
-    color: #fff;
-    border-radius: 9px;
-    padding: 9px 15px;
-    font-size: 13px;
-    font-weight: 700
-}
-
-.state-box-bottom button:hover {
-    background: #d99000
-}
-
-.state-box-bottom b {
-    font-size: 17px;
-    margin-left: 3px
-}
-
-@media(max-width:767px) {
-    .states-container {
-        padding-top: 35px
-    }
-
-    .states-heading h2 {
-        font-size: 27px
-    }
-
-    .state-place-image {
-        height: 235px
-    }
-
-    .state-box-bottom {
-        align-items: stretch;
-        flex-direction: column
-    }
-
-    .state-box-bottom button {
-        width: 100%
-    }
-
-    .state-box-top h3 {
-        font-size: 19px
-    }
+.card-overlay button {
+    background: #c25b2b;
+    border: none;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
 }

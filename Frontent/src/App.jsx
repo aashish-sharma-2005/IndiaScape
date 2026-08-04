@@ -1,5 +1,4 @@
 import './App.css';
-import { useEffect, useState } from "react";
 import { TopNavBar } from "./screen/Navbar/index";
 import { HomeHeroPage } from "./screen/HeroPage/index";
 import { Routes, Route, useLocation } from "react-router-dom";
@@ -10,24 +9,25 @@ import { HomePage } from "./screen/Home";
 import { States } from "./screen/State/index";
 import Admin from "./screen/Admin/index";
 import { useDispatch } from "react-redux";
-import { loginSuccess, logout } from "./store/loginSlice";
 import Loading from "./screen/Loading/";
 import UserRoute from "./Guards/UserRoute";
 import AdminRoute from "./Guards/AdminRoutes";
 import AdminPlaces from "./component/Admin/AdminPlaces";
 import AdminLayout from "./component/Admin/AdminLayout";
-import { OneStateData } from "./component/State/OneStateData";
+import { OneState } from "./screen/State/OneState";
 import AdminStates from "./component/Admin/AdminStates";
 import { Details } from "./screen/Details";
 import Footer from "./screen/Navbar/Footer";
-import NotFound from './screen/NotFound/index'
+import NotFound from "./screen/NotFound/index";
+import { fetchStatesData } from "./store/statesSlice";
+import { useEffect, useState } from "react";
+import { loginSuccess, logout } from "./store/loginSlice";
 
 function App() {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
 
   const location = useLocation();
-
+  const [loading, setLoading] = useState(true);
   const isAdmin = location.pathname.startsWith("/admin");
 
   const isAuthPage =
@@ -61,12 +61,12 @@ function App() {
     };
 
     getUser();
+    dispatch(fetchStatesData());
   }, [dispatch]);
 
   if (loading) {
     return <Loading />;
   }
-
   return (
     <div className="app-shell">
 
@@ -75,11 +75,7 @@ function App() {
 
       {/* PAGE CONTENT */}
       <main
-        className={`app-main ${
-          isAdmin ? "admin-main" : ""
-        } ${
-          isAuthPage ? "auth-main" : ""
-        }`}
+        className={`app-main ${isAuthPage ? "auth-main" : ""}`}
       >
         <Routes>
 
@@ -128,7 +124,7 @@ function App() {
             path="/dashboard/states/:state"
             element={
               <UserRoute>
-                <OneStateData />
+                <OneState />
               </UserRoute>
             }
           />

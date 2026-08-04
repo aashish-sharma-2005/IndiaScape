@@ -1,5 +1,3 @@
-import { Container, Row, Col, Button } from "react-bootstrap";
-import Carousel from "react-bootstrap/Carousel";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "./allStateData.css";
@@ -11,87 +9,50 @@ export function AllStateData() {
         (state) => state.states
     );
 
+    const getPlaces = (stateId) => {
+        return famous.filter(
+            (item) => item.state_id?._id === stateId
+        );
+    };
+
+    const availableStates = states.filter(
+        (state) => getPlaces(state._id).length > 0
+    );
+
     return (
-        <Container className="states-container">
-            <div className="states-heading">
-                <p>EXPLORE INDIA</p>
-                <h2>Discover Places by State</h2>
-                <span>
-                    Find beautiful destinations, hidden gems and
-                    unforgettable experiences across India.
-                </span>
-            </div>
+        <section className="simple-states">
 
-            <Row className="g-4">
-                {states.map((state) => {
-                    const places = famous.filter(
-                        (item) => item.state_id?._id === state._id
-                    );
+            <h2>Explore Indian States</h2>
 
-                    if (!places.length) return null;
+            <div className="states-grid">
+
+                {availableStates.map((state) => {
+
+                    const places = getPlaces(state._id);
+                    const image = places[0]?.photos?.[0]?.url;
+
+                    if (!image) return null;
 
                     return (
-                        <Col lg={6} key={state._id}>
-                            <div className="state-box">
+                        <div
+                            key={state._id}
+                            className="state-card"
+                            onClick={() =>
+                                navigate(`/dashboard/states/${state.name}`)
+                            }
+                        >
+                            <img src={image} alt={state.name} />
 
-                                <div className="state-box-top">
-                                    <div>
-                                        <small>STATE</small>
-                                        <h3>{state.name}</h3>
-                                    </div>
-
-                                    <div className="place-count">
-                                        {places.length} Places
-                                    </div>
-                                </div>
-
-                                <Carousel
-                                    fade
-                                    interval={3000}
-                                    indicators={places.length > 1}
-                                    controls={places.length > 1}
-                                >
-                                    {places.slice(0, 4).map((place) => (
-                                        <Carousel.Item key={place._id}>
-                                            <div className="state-place-image">
-                                                <img
-                                                    src={place.photos?.[0]?.url}
-                                                    alt={place.name}
-                                                />
-
-                                                <div className="place-overlay">
-                                                    <div>
-                                                        <h4>{place.name}</h4>
-                                                        <p>{place.title}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Carousel.Item>
-                                    ))}
-                                </Carousel>
-
-                                <div className="state-box-bottom">
-                                    <span>
-                                        Explore amazing places in{" "}
-                                        {state.name}
-                                    </span>
-
-                                    <Button
-                                        onClick={() =>
-                                            navigate(
-                                                `/dashboard/states/${state.name}`
-                                            )
-                                        }
-                                    >
-                                        View All <b>→</b>
-                                    </Button>
-                                </div>
-
+                            <div className="card-overlay">
+                                <h3>{state.name}</h3>
+                                <button>Explore More</button>
                             </div>
-                        </Col>
+                        </div>
                     );
                 })}
-            </Row>
-        </Container>
+
+            </div>
+
+        </section>
     );
 }

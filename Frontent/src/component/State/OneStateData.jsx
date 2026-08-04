@@ -1,35 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { StateCards } from "./StateCards";
+import { visitState } from "../../store/loginSlice";
 
 export function OneStateData() {
+
     const { state } = useParams();
-    const [places, setPlaces] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
+
+    const { states, famous } = useSelector(
+        (state) => state.states
+    );
+
+    const currentState = states.find(
+        (item) => item.name === state
+    );
+
+    const places = famous.filter(
+        (item) => item.state_id?._id === currentState?._id
+    );
 
     useEffect(() => {
-        const getStatePlaces = async () => {
-            try {
-                const response = await fetch(`http://localhost:3000/dashboard/states/${state}`, {
-                    credentials: "include",
-                }
-                );
-                const result = await response.json();
-                if (result.status) {
-                    setPlaces(result.places);
-                }
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        if (currentState?._id) {
+            dispatch(visitState(currentState._id));
+        }
+    }, [currentState?._id, dispatch]);
 
-        getStatePlaces();
-    }, [state]);
-    if (loading) {
-        return <h2>Loading...</h2>;
+    if (!currentState) {
+        return <h1>State Not Found</h1>;
     }
+
     return (
         <>
             {places.length ? (

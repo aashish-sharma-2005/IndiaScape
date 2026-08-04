@@ -6,9 +6,10 @@ export default function HomeStats() {
     (state) => state.loginReducer.user
   );
 
+  console.log("REDUX USER:", user);
+  console.log("VISITED STATES:", user?.visitedStates);
   return (
     <div className="stats-wrapper">
-
       {/* STATES EXPLORED */}
 
       <div className="modern-stat-card">

@@ -1,12 +1,9 @@
 import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom"
-function UserRoute({ children }) {
-    const isLogin = useSelector(
-        (state) => state.loginReducer.isLogin
-    );
+import { Navigate } from "react-router-dom";
 
-    const user = useSelector(
-        (state) => state.loginReducer.user
+function UserRoute({ children }) {
+    const { isLogin, user } = useSelector(
+        (state) => state.loginReducer
     );
 
     if (!isLogin) {
@@ -19,4 +16,5 @@ function UserRoute({ children }) {
 
     return children;
 }
-export default UserRoute
+
+export default UserRoute;

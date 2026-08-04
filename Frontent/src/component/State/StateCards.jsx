@@ -1,12 +1,13 @@
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export function StateCards({ places }) {
-  const { state } = useParams()
-  const navigate = useNavigate()
-  const navigateDetails = (id) => {
-    navigate(`/dashboard/place/${id}`)
-  }
+  const navigate = useNavigate();
+
+  const navigateToDetails = (id) => {
+    navigate(`/dashboard/place/${id}`);
+  };
+
   return (
     <Container className="py-4">
       <Row className="g-4">
@@ -32,14 +33,14 @@ export function StateCards({ places }) {
 
                 <Card.Text>
                   {place.description.length > 80
-                    ? place.description.substring(0, 80) + "..."
+                    ? `${place.description.substring(0, 80)}...`
                     : place.description}
                 </Card.Text>
 
                 <Button
-                  onClick={() => navigateDetails(place._id)}
                   variant="warning"
                   className="mt-auto rounded-pill"
+                  onClick={() => navigateToDetails(place._id)}
                 >
                   View Details
                 </Button>
