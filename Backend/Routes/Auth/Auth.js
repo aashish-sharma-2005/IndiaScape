@@ -8,7 +8,7 @@ router.post('/signup',postSignup)
 router.post('/login',postLogin)
 router.post('/verify-otp',postVerifyOtp)
 router.post('/resend-otp',resendOtp)
-router.post('/logout',(req,res)=>{
+router.get('/logout',(req,res)=>{
     res.clearCookie("token", {
         httpOnly: true,
         secure: false,
