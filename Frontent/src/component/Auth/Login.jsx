@@ -4,12 +4,11 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import "./Auth.css";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../../store/loginSlice";
+import { fetchUser } from "../../store/loginSlice";
 
 function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
 
   const formik = useFormik({
     initialValues: {
@@ -18,15 +17,21 @@ function LoginPage() {
     },
 
     validationSchema: Yup.object({
-      email: Yup.string().email("Invalid email address").required("Email is required"),
-      password: Yup.string().required("Password is required"),
+      email: Yup.string()
+        .email("Invalid email address")
+        .required("Email is required"),
+
+      password: Yup.string()
+        .required("Password is required"),
     }),
 
     onSubmit: async (values, { setSubmitting }) => {
       try {
         const response = await fetch("http://localhost:3000/login", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           credentials: "include",
           body: JSON.stringify(values),
         });
@@ -37,16 +42,18 @@ function LoginPage() {
           toast.error(result.message);
           return;
         }
-        if (result.status) {
-          dispatch(loginSuccess({
-            role: result.role,
-            location: result.location
-          }));
 
+        if (result.status) {
+          // Latest user data Redux me load hoga
+          await dispatch(fetchUser()).unwrap();
+
+          // Uske baad dashboard open hoga
           navigate(result.location);
         }
+
       } catch (error) {
         toast.error("Unable to connect to server");
+
       } finally {
         setSubmitting(false);
       }
@@ -56,12 +63,15 @@ function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+
         <h1>Welcome Back</h1>
+
         <p className="auth-subtitle">
           Continue your journey across Incredible India
         </p>
 
         <form onSubmit={formik.handleSubmit}>
+
           <div className="input-group-custom">
             <label>Email Address</label>
 
@@ -101,6 +111,7 @@ function LoginPage() {
           </div>
 
           <div className="auth-options">
+
             <label>
               <input type="checkbox" />
               Remember me
@@ -109,19 +120,31 @@ function LoginPage() {
             <Link to="/forgot-password">
               Forgot Password?
             </Link>
+
           </div>
 
-          <button type="submit" className="auth-submit-btn" disabled={formik.isSubmitting || !formik.isValid}>
-            {formik.isSubmitting ? "Logging in..." : "Login"}
+          <button
+            type="submit"
+            className="auth-submit-btn"
+            disabled={
+              formik.isSubmitting || !formik.isValid
+            }
+          >
+            {formik.isSubmitting
+              ? "Logging in..."
+              : "Login"}
           </button>
+
         </form>
 
         <p className="auth-bottom-text">
           Don't have an account?
+
           <Link to="/signup">
             Create Account
           </Link>
         </p>
+
       </div>
     </div>
   );
