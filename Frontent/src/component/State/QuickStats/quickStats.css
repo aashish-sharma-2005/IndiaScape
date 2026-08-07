@@ -1,0 +1,184 @@
+/* =====================================================
+   QUICK STATS
+===================================================== */
+
+.quick-stats {
+    width: 100%;
+    box-sizing: border-box;
+
+    position: sticky;
+    top: 25px;
+
+    align-self: start;
+
+    padding: 28px 24px;
+
+    background: linear-gradient(
+        145deg,
+        #fffaf0,
+        #f0e2cc
+    );
+
+    border: 1px solid #d8c3a2;
+
+    box-shadow:
+        0 15px 40px rgba(73, 43, 19, 0.09);
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.stats-header span {
+    color: #b16a26;
+
+    font-size: 9px;
+    letter-spacing: 3px;
+}
+
+.stats-header h3 {
+    margin: 8px 0 25px;
+
+    color: #302015;
+
+    font-family: Georgia, serif;
+
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+
+/* =====================================================
+   STAT ITEM
+===================================================== */
+
+.stat-item {
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 18px 0;
+
+    border-top: 1px solid #d8c8b0;
+}
+
+.stat-icon {
+    width: 36px;
+    height: 36px;
+
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #ead6b8;
+    color: #a45d20;
+
+    font-size: 15px;
+}
+
+.stat-item strong {
+    display: block;
+
+    color: #3b281b;
+
+    font-family: Georgia, serif;
+
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.stat-item small {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #857665;
+
+    font-size: 10px;
+}
+
+
+/* =====================================================
+   QUOTE
+===================================================== */
+
+.stats-quote {
+    margin: 20px 0;
+
+    padding: 18px;
+
+    border-left: 2px solid #b36b27;
+
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.stats-quote p {
+    margin: 0;
+
+    color: #705d4b;
+
+    font-family: Georgia, serif;
+
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   BACK TO TOP
+===================================================== */
+
+.stats-explore {
+    width: 100%;
+
+    padding: 13px;
+
+    border: none;
+
+    background: #8d4b1c;
+
+    color: white;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 11px;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+}
+
+.stats-explore:hover {
+    background: #642f11;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    .quick-stats {
+        position: static;
+
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .quick-stats {
+        width: 100%;
+    }
+
+}

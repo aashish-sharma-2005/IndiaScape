@@ -5,9 +5,6 @@ export default function HomeStats() {
   const user = useSelector(
     (state) => state.loginReducer.user
   );
-
-  console.log("REDUX USER:", user);
-  console.log("VISITED STATES:", user?.visitedStates);
   return (
     <div className="stats-wrapper">
       {/* STATES EXPLORED */}

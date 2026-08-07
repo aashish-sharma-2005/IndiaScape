@@ -1,0 +1,355 @@
+/* =====================================================
+   INDIASCAPE — PREMIUM STATE CARD
+===================================================== */
+
+.state-card {
+    position: relative;
+
+    height: 390px;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 12px;
+
+    background: #160d07;
+
+    box-shadow:
+        0 12px 35px rgba(54, 31, 12, 0.10);
+
+    cursor: pointer;
+
+    isolation: isolate;
+
+    transition:
+        transform 0.5s cubic-bezier(.2,.7,.2,1),
+        box-shadow 0.5s ease;
+}
+
+.state-card:hover {
+    transform: translateY(-10px);
+
+    box-shadow:
+        0 28px 65px rgba(54, 31, 12, 0.24);
+}
+
+
+/* =====================================================
+   IMAGE
+===================================================== */
+
+.state-card-image {
+    position: absolute;
+    inset: 0;
+
+    overflow: hidden;
+}
+
+.state-card-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transform: scale(1.01);
+
+    transition:
+        transform 1s cubic-bezier(.2,.7,.2,1),
+        filter 0.6s ease;
+}
+
+.state-card:hover
+.state-card-image img {
+    transform: scale(1.10);
+
+    filter: saturate(1.08);
+}
+
+
+/* =====================================================
+   CINEMATIC OVERLAY
+===================================================== */
+
+.state-card-overlay {
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,0.02) 15%,
+            rgba(0,0,0,0.04) 38%,
+            rgba(0,0,0,0.32) 58%,
+            rgba(8,4,2,0.94) 100%
+        );
+
+    z-index: 1;
+}
+
+
+/* =====================================================
+   TOP DECORATIVE LINE
+===================================================== */
+
+.state-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 16px;
+    left: 18px;
+    right: 18px;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,220,160,0.55),
+            transparent
+        );
+
+    z-index: 5;
+
+    opacity: 0;
+
+    transition: opacity 0.4s ease;
+}
+
+.state-card:hover::before {
+    opacity: 1;
+}
+
+
+/* =====================================================
+   PLACEHOLDER
+===================================================== */
+
+.state-image-placeholder {
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    place-items: center;
+
+    background:
+        radial-gradient(
+            circle at 30% 20%,
+            #d19a50,
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #563017,
+            #b8732d
+        );
+
+    color: white;
+
+    font-family: Georgia, serif;
+    font-size: 26px;
+}
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.state-card-content {
+    position: absolute;
+
+    left: 26px;
+    right: 26px;
+    bottom: 76px;
+
+    z-index: 3;
+}
+
+
+/* small label */
+
+.state-card-content::before {
+    content: "DISCOVER";
+
+    display: block;
+
+    margin-bottom: 9px;
+
+    color: #e4b45f;
+
+    font-size: 8px;
+    font-weight: 600;
+
+    letter-spacing: 3px;
+}
+
+
+/* title */
+
+.state-card-content h3 {
+    margin: 0;
+
+    color: #fffaf0;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 34px;
+    font-weight: 400;
+
+    line-height: 1;
+
+    letter-spacing: -0.7px;
+
+    text-shadow:
+        0 4px 18px rgba(0,0,0,0.35);
+}
+
+
+/* description */
+
+.state-card-content p {
+    max-width: 90%;
+
+    margin: 10px 0 0;
+
+    color: rgba(255,255,255,0.68);
+
+    font-size: 10px;
+
+    line-height: 1.6;
+
+    display: -webkit-box;
+
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.state-card-footer {
+    position: absolute;
+
+    left: 26px;
+    right: 26px;
+    bottom: 20px;
+
+    z-index: 4;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding-top: 13px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,0.19);
+}
+
+
+/* left text */
+
+.state-card-footer > span {
+    color: rgba(255,255,255,0.48);
+
+    font-size: 8px;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+
+/* =====================================================
+   EXPLORE BUTTON
+===================================================== */
+
+.state-card-footer button {
+    display: inline-flex;
+
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 12px;
+
+    border: 1px solid
+        rgba(239,193,108,0.45);
+
+    border-radius: 100px;
+
+    background:
+        rgba(255,255,255,0.06);
+
+    color: #f0c36e;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 9px;
+
+    backdrop-filter: blur(8px);
+
+    cursor: pointer;
+
+    transition:
+        background 0.3s ease,
+        border-color 0.3s ease,
+        gap 0.3s ease,
+        transform 0.3s ease;
+}
+
+.state-card-footer button:hover {
+    gap: 12px;
+
+    background: rgba(221,156,63,0.18);
+
+    border-color: #efc16c;
+
+    transform: translateX(2px);
+}
+
+.state-card-footer button span {
+    color: inherit;
+
+    font-size: 15px;
+
+    line-height: 1;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .state-card {
+        height: 360px;
+    }
+
+    .state-card-content {
+        left: 22px;
+        right: 22px;
+    }
+
+    .state-card-content h3 {
+        font-size: 30px;
+    }
+
+    .state-card-footer {
+        left: 22px;
+        right: 22px;
+    }
+
+}

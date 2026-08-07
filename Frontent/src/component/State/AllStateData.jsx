@@ -1,58 +1,74 @@
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+
+import StateHero from "./StateHero/StateHero";
+import StateIntro from "./StateIntro/StateIntro";
+import StateFilter from "./StateFilter/StateFilter";
+import StateGrid from "./StateGrid/StateGrid";
+
 import "./allStateData.css";
 
 export function AllStateData() {
-    const navigate = useNavigate();
 
-    const { famous, states } = useSelector(
+    const { states = [], famous = [] } = useSelector(
         (state) => state.states
     );
 
-    const getPlaces = (stateId) => {
-        return famous.filter(
-            (item) => item.state_id?._id === stateId
-        );
-    };
+    const [activeCategory, setActiveCategory] = useState("All");
 
-    const availableStates = states.filter(
-        (state) => getPlaces(state._id).length > 0
-    );
+    const filteredStates = useMemo(() => {
+
+        if (activeCategory === "All") {
+            return states;
+        }
+
+        return states.filter(
+            (state) =>
+                state.category?.toLowerCase() ===
+                activeCategory.toLowerCase()
+        );
+
+    }, [states, activeCategory]);
+
 
     return (
-        <section className="simple-states">
+        <main className="all-states-page">
 
-            <h2>Explore Indian States</h2>
+            <StateHero famous={famous} />
 
-            <div className="states-grid">
+            <StateIntro
+                stateCount={states.length}
+            />
 
-                {availableStates.map((state) => {
+            <StateFilter
+                activeCategory={activeCategory}
+                setActiveCategory={setActiveCategory}
+            />
 
-                    const places = getPlaces(state._id);
-                    const image = places[0]?.photos?.[0]?.url;
+            <section className="states-section">
 
-                    if (!image) return null;
+                <div className="states-section-top">
 
-                    return (
-                        <div
-                            key={state._id}
-                            className="state-card"
-                            onClick={() =>
-                                navigate(`/dashboard/states/${state.name}`)
-                            }
-                        >
-                            <img src={image} alt={state.name} />
+                    <div>
+                        <span className="states-section-eyebrow">
+                            DESTINATIONS
+                        </span>
 
-                            <div className="card-overlay">
-                                <h3>{state.name}</h3>
-                                <button>Explore More</button>
-                            </div>
-                        </div>
-                    );
-                })}
+                        <h3>
+                            Where will you go?
+                        </h3>
+                    </div>
 
-            </div>
+                    <span className="states-result-count">
+                        {filteredStates.length} destinations
+                    </span>
 
-        </section>
+                </div>
+
+                <StateGrid states={filteredStates} />
+
+            </section>
+
+        </main>
     );
 }

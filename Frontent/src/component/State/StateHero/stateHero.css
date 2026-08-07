@@ -1,0 +1,268 @@
+/* =====================================================
+   STATE HERO
+===================================================== */
+
+.state-hero {
+    position: relative;
+
+    min-height: 620px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 80px 7%;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(18, 10, 5, 0.9),
+            rgba(18, 10, 5, 0.58),
+            rgba(18, 10, 5, 0.18)
+        ),
+        url("https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=2000&q=90");
+
+    background-size: cover;
+    background-position: center;
+}
+
+
+/* Overlay */
+
+.state-hero-overlay {
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle at 72% 45%,
+            rgba(231, 170, 53, 0.2),
+            transparent 32%
+        );
+}
+
+
+/* =====================================================
+   HERO CONTENT
+===================================================== */
+
+.state-hero-content {
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 620px;
+}
+
+.state-hero-label {
+    display: block;
+
+    margin-bottom: 18px;
+
+    color: #e7bc70;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    letter-spacing: 4px;
+}
+
+.state-hero-content h1 {
+    margin: 0;
+
+    color: #fff8e9;
+
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-size: clamp(58px, 7vw, 94px);
+
+    font-weight: 400;
+
+    line-height: 0.92;
+
+    letter-spacing: -4px;
+}
+
+.state-hero-content h1 span {
+    color: #e5a83b;
+}
+
+.state-hero-content p {
+    max-width: 500px;
+
+    margin: 28px 0;
+
+    color: rgba(255, 248, 233, 0.82);
+
+    font-size: 16px;
+
+    line-height: 1.8;
+}
+
+
+/* =====================================================
+   HERO BUTTON
+===================================================== */
+
+.state-hero-button {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 22px;
+
+    padding: 14px 22px;
+
+    border: 1px solid rgba(255, 255, 255, 0.28);
+
+    border-radius: 3px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    color: white;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 12px;
+
+    backdrop-filter: blur(12px);
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+}
+
+.state-hero-button:hover {
+    background: #a85d20;
+
+    border-color: #a85d20;
+
+    transform: translateY(-3px);
+}
+
+.state-hero-button span {
+    font-size: 19px;
+}
+
+
+/* =====================================================
+   FEATURED PLACE
+===================================================== */
+
+.featured-place {
+    position: absolute;
+
+    right: 7%;
+    bottom: 55px;
+
+    z-index: 4;
+
+    width: 300px;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+
+    border-radius: 4px;
+
+    background: rgba(20, 12, 7, 0.75);
+
+    backdrop-filter: blur(14px);
+
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.35);
+
+    transition: 0.4s ease;
+}
+
+.featured-place:hover {
+    transform: translateY(-7px);
+}
+
+.featured-place img {
+    width: 100%;
+    height: 175px;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+.featured-place-content {
+    padding: 18px;
+}
+
+.featured-place-content span {
+    color: #dfa54e;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+}
+
+.featured-place-content h3 {
+    margin: 7px 0;
+
+    color: white;
+
+    font-family: Georgia, serif;
+
+    font-size: 24px;
+
+    font-weight: 400;
+}
+
+.featured-place-content p {
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.65);
+
+    font-size: 11px;
+
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 800px) {
+
+    .state-hero {
+        min-height: 560px;
+
+        padding: 60px 25px;
+    }
+
+    .featured-place {
+        display: none;
+    }
+
+    .state-hero-content {
+        max-width: 100%;
+    }
+
+}
+
+@media (max-width: 550px) {
+
+    .state-hero {
+        min-height: 520px;
+    }
+
+    .state-hero-content h1 {
+        font-size: 52px;
+
+        letter-spacing: -2px;
+    }
+
+    .state-hero-label {
+        font-size: 9px;
+
+        letter-spacing: 2.5px;
+    }
+
+}

@@ -1,0 +1,73 @@
+/* =====================================================
+   INDIASCAPE — STATE GRID
+===================================================== */
+
+.state-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 26px;
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.no-states {
+    min-height: 300px;
+
+    grid-column: 1 / -1;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color: #806f5d;
+}
+
+.no-states h3 {
+    margin: 0 0 8px;
+
+    font-family: Georgia, serif;
+    font-size: 30px;
+    font-weight: 400;
+}
+
+.no-states p {
+    margin: 0;
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1050px) {
+
+    .state-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 22px;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .state-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+}

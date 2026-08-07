@@ -1,0 +1,76 @@
+/* =====================================================
+   STATE FILTER
+===================================================== */
+
+.state-filter {
+    display: flex;
+
+    gap: 6px;
+
+    margin: 15px 7% 38px;
+
+    padding: 5px;
+
+    border-bottom: 1px solid #d8cbb7;
+}
+
+
+/* Buttons */
+
+.state-filter button {
+    padding: 12px 24px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #746657;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 12px;
+
+    cursor: pointer;
+
+    transition: 0.3s ease;
+}
+
+.state-filter button:hover {
+    color: #9c5b20;
+}
+
+
+/* Active */
+
+.state-filter button.active {
+    background: #8d4b1c;
+
+    color: white;
+
+    box-shadow:
+        0 6px 18px rgba(99, 51, 18, 0.18);
+}
+
+
+/* Mobile */
+
+@media (max-width: 800px) {
+
+    .state-filter {
+        margin-left: 25px;
+        margin-right: 25px;
+
+        overflow-x: auto;
+
+        scrollbar-width: none;
+    }
+
+    .state-filter::-webkit-scrollbar {
+        display: none;
+    }
+
+    .state-filter button {
+        flex-shrink: 0;
+    }
+
+}
