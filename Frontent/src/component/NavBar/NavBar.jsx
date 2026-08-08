@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../store/loginSlice";
+import { logout, logoutUser } from "../../store/loginSlice";
 import "./NavBar.css";
 
 const NavBar = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
- const { isLogin, user } = useSelector(
-  (state) => state.loginReducer
-);
+  const { isLogin, user } = useSelector(
+    (state) => state.loginReducer
+  );
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -183,9 +183,8 @@ const NavBar = () => {
             </span>
 
             <span
-              className={`arrow ${
-                dropdownOpen ? "rotate" : ""
-              }`}
+              className={`arrow ${dropdownOpen ? "rotate" : ""
+                }`}
             >
               ▼
             </span>
@@ -203,9 +202,13 @@ const NavBar = () => {
 
               <button
                 type="button"
-                onClick={() => {
-                  dispatch(logout());
-                  setDropdownOpen(false);
+                onClick={async () => {
+                  try {
+                    await dispatch(logoutUser()).unwrap();
+                    setDropdownOpen(false);
+                  } catch (error) {
+                    console.log("Logout failed:", error);
+                  }
                 }}
               >
                 Logout
