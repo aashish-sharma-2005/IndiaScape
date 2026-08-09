@@ -20,18 +20,29 @@ html {
 }
 
 body {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-  background: #f8f1df;
-  color: #3d291d;
+    background-image:
+        linear-gradient(
+            rgba(248, 241, 223, 0.78),
+            rgba(248, 241, 223, 0.78)
+        ),
+        url("/images/india-bg.png");
 
-  overflow-x: hidden;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+
+    color: #3d291d;
+
+    overflow-x: hidden;
 }
 
 
@@ -40,13 +51,13 @@ body {
 ========================================= */
 
 .app-shell {
-  width: 100%;
-  min-height: 100vh;
+    width: 100%;
+    min-height: 100vh;
 
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 
-  background: #f8f1df;
+    background: transparent;
 }
 
 
@@ -55,19 +66,11 @@ body {
 ========================================= */
 
 .app-main {
-  width: 100%;
-
-  flex: 1;
-
-  min-height: 0;
-
-  position: relative;
-
-  /* IMPORTANT:
-     Header normal document flow me hai.
-     Isliye yahan padding-top NAHI hoga.
-  */
-  padding: 0;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    padding: 0;
 }
 
 

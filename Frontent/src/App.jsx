@@ -1,5 +1,5 @@
 import "./App.css";
-
+import socket from './socket/socket'
 import { TopNavBar } from "./screen/Navbar/index";
 import { HomeHeroPage } from "./screen/HeroPage/index";
 import {
@@ -33,12 +33,12 @@ import AdminRoute from "./Guards/AdminRoutes";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 
-import { fetchStatesData } from "./store/statesSlice";
+import { fetchStatesData, updateState } from "./store/statesSlice";
 import { fetchUser } from "./store/loginSlice";
 
 
 function App() {
-
+    console.log("Socket:", socket.id);
     const dispatch = useDispatch();
     const location = useLocation();
 
@@ -46,16 +46,57 @@ function App() {
 
     const isAdmin = location.pathname.startsWith("/admin");
 
-    const isAuthPage =
-        location.pathname === "/login" ||
-        location.pathname === "/signup" ||
-        location.pathname === "/verify-otp";
+    const isAuthPage = location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/verify-otp";
 
 
     // =========================================
     // INITIALIZE APPLICATION
     // =========================================
 
+    useEffect(() => {
+
+        const initializeApp = async () => {
+
+            try {
+
+                await dispatch(fetchUser()).unwrap();
+
+            } catch (error) {
+
+                console.log("User not authenticated");
+
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        };
+
+        initializeApp();
+
+        dispatch(fetchStatesData());
+
+    }, [dispatch]);
+
+
+    // =========================================
+    // REAL-TIME STATE UPDATES
+    // =========================================
+
+    useEffect(() => {
+
+        const handleStateUpdated = (updatedState) => {
+            dispatch(updateState(updatedState));
+        };
+
+        socket.on("stateUpdated", handleStateUpdated);
+
+        return () => {
+            socket.off("stateUpdated", handleStateUpdated);
+        };
+
+    }, []);
     useEffect(() => {
 
         const initializeApp = async () => {
@@ -111,9 +152,8 @@ function App() {
 
             {/* PAGE CONTENT */}
             <main
-                className={`app-main ${
-                    isAuthPage ? "auth-main" : ""
-                }`}
+                className={`app-main ${isAuthPage ? "auth-main" : ""
+                    }`}
             >
 
                 <Routes>

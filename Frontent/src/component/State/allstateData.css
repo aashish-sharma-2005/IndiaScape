@@ -4,13 +4,8 @@
 
 .all-states-page {
     min-height: 100vh;
-    background:
-        radial-gradient(
-            circle at 10% 30%,
-            rgba(192, 133, 57, 0.08),
-            transparent 28%
-        ),
-        #f7f2e9;
+
+    background: transparent;
 
     color: #24180f;
     font-family: "Poppins", sans-serif;
@@ -110,6 +105,196 @@
     .states-section {
         width: calc(100% - 36px);
         padding-bottom: 70px;
+    }
+
+}
+/* =====================================================
+   STATES — LOADING SKELETON
+===================================================== */
+
+.states-loading {
+    min-height: 100vh;
+    padding: 70px 0 110px;
+}
+
+/* Hero skeleton */
+
+.loading-hero {
+    width: min(1380px, 86%);
+    margin: 0 auto 70px;
+}
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+
+    background: #e9e1d5;
+    border-radius: 8px;
+}
+
+/* Moving light */
+
+.skeleton::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        120deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.75) 50%,
+        transparent 80%
+    );
+
+    transform: translate(-100%, -100%);
+
+    animation: skeletonShimmer 1.6s infinite;
+}
+
+@keyframes skeletonShimmer {
+
+    0% {
+        transform: translate(-100%, -100%);
+    }
+
+    100% {
+        transform: translate(100%, 100%);
+    }
+
+}
+
+
+/* Hero placeholders */
+
+.skeleton-hero-title {
+    width: 48%;
+    height: 55px;
+    margin-bottom: 22px;
+}
+
+.skeleton-hero-text {
+    width: 65%;
+    height: 15px;
+    margin-bottom: 12px;
+}
+
+.skeleton-hero-text.short {
+    width: 42%;
+}
+
+
+/* Main loading content */
+
+.loading-content {
+    width: min(1380px, 86%);
+    margin: 0 auto;
+}
+
+.skeleton-heading {
+    width: 280px;
+    height: 42px;
+    margin-bottom: 35px;
+}
+
+
+/* Cards */
+
+.skeleton-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 28px;
+}
+
+.skeleton-state-card {
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background: #eee7dc;
+
+    box-shadow:
+        0 8px 25px rgba(65, 45, 25, 0.06);
+}
+
+.skeleton-card-image {
+    width: 100%;
+    height: 230px;
+
+    border-radius: 0;
+}
+
+.skeleton-card-content {
+    padding: 20px;
+}
+
+.skeleton-card-title {
+    width: 70%;
+    height: 20px;
+    margin-bottom: 18px;
+}
+
+.skeleton-card-text {
+    width: 90%;
+    height: 11px;
+    margin-bottom: 10px;
+}
+
+.skeleton-card-text.short {
+    width: 55%;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    .skeleton-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+
+@media (max-width: 800px) {
+
+    .states-loading {
+        padding-top: 50px;
+    }
+
+    .loading-hero,
+    .loading-content {
+        width: calc(100% - 50px);
+    }
+
+    .skeleton-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .skeleton-hero-title {
+        width: 75%;
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    .loading-hero,
+    .loading-content {
+        width: calc(100% - 36px);
+    }
+
+    .skeleton-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .skeleton-card-image {
+        height: 220px;
     }
 
 }

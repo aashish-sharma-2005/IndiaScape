@@ -296,3 +296,34 @@
         display: none
     }
 }
+.state-name-input {
+    width: 100%;
+    max-width: 190px;
+    padding: 7px 9px;
+    border: 1px solid #b98a52;
+    border-radius: 7px;
+    background: #fffdf8;
+    color: #24180f;
+    font-size: 17px;
+    font-weight: 600;
+    outline: none;
+}
+
+.state-name-input:focus {
+    border-color: #8b5e34;
+    box-shadow: 0 0 0 3px rgba(139, 94, 52, 0.12);
+}
+
+.state-saving-spinner {
+    animation: stateSpinner 0.8s linear infinite;
+}
+
+@keyframes stateSpinner {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

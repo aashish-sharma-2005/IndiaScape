@@ -1,15 +1,26 @@
 const State = require("../../Models/states");
 const Famous = require("../../Models/famous");
 
+const { getSocketIO } = require("../../Config/socket");
+
+
+// =========================================
+// ADD STATE
+// =========================================
+
 async function addState(req, res) {
+
     try {
+
         const { name } = req.body;
 
         if (!name?.trim()) {
+
             return res.status(400).json({
                 status: false,
                 message: "State name is required"
             });
+
         }
 
         const exists = await State.findOne({
@@ -17,10 +28,12 @@ async function addState(req, res) {
         });
 
         if (exists) {
+
             return res.status(400).json({
                 status: false,
                 message: "State already exists"
             });
+
         }
 
         const state = await State.create({
@@ -34,15 +47,25 @@ async function addState(req, res) {
         });
 
     } catch (error) {
+
         console.log(error);
+
         return res.status(500).json({
             status: false,
             message: "Server Error"
         });
+
     }
+
 }
 
+
+// =========================================
+// UPDATE STATE
+// =========================================
+
 async function updateState(req, res) {
+
     try {
 
         const { id } = req.params;
@@ -50,9 +73,39 @@ async function updateState(req, res) {
 
         const state = await State.findByIdAndUpdate(
             id,
-            { name: name.trim() },
-            { returnDocument: 'after' }
+            {
+                name: name.trim()
+            },
+            {
+                returnDocument: "after"
+            }
         );
+
+        if (!state) {
+
+            return res.status(404).json({
+                status: false,
+                message: "State not found"
+            });
+
+        }
+
+
+        // =========================================
+        // REAL-TIME UPDATE
+        // =========================================
+
+        const io = getSocketIO();
+
+        if (io) {
+
+            io.emit(
+                "stateUpdated",
+                state
+            );
+
+        }
+
 
         return res.status(200).json({
             status: true,
@@ -61,27 +114,42 @@ async function updateState(req, res) {
         });
 
     } catch (error) {
+
         console.log(error);
+
         return res.status(500).json({
             status: false,
             message: "Server Error"
         });
+
     }
+
 }
 
+
+// =========================================
+// DELETE STATE
+// =========================================
+
 async function deleteState(req, res) {
+
     try {
+
+        const { id } = req.params;
 
         const placeExists = await Famous.findOne({
             state_id: id
         });
+
         if (placeExists) {
+
             return res.status(400).json({
                 status: false,
-                message: "This state contains places. Delete those places first."
+                message:
+                    "This state contains places. Delete those places first."
             });
+
         }
-        const { id } = req.params;
 
         await State.findByIdAndDelete(id);
 
@@ -91,27 +159,68 @@ async function deleteState(req, res) {
         });
 
     } catch (error) {
+
         console.log(error);
+
         return res.status(500).json({
             status: false,
             message: "Server Error"
         });
+
     }
+
 }
-async function toggleStateVisibility(req,res){
-    try{
-        const {id}=req.params;
-        const {visible}=req.body;
-        const state=await State.findByIdAndUpdate(id,{visible},{returnDocument:true});
-        if(!state){
-            return res.status(404).json({status:false,message:"State not found"});
+
+
+// =========================================
+// TOGGLE STATE VISIBILITY
+// =========================================
+
+async function toggleStateVisibility(req, res) {
+
+    try {
+
+        const { id } = req.params;
+        const { visible } = req.body;
+
+        const state = await State.findByIdAndUpdate(
+            id,
+            {
+                visible
+            },
+            {
+                returnDocument: "after"
+            }
+        );
+
+        if (!state) {
+
+            return res.status(404).json({
+                status: false,
+                message: "State not found"
+            });
+
         }
-        return res.json({status:true,message:"State visibility updated",state});
-    }catch(error){
+
+        return res.json({
+            status: true,
+            message: "State visibility updated",
+            state
+        });
+
+    } catch (error) {
+
         console.log(error);
-        return res.status(500).json({status:false,message:"Server error"});
+
+        return res.status(500).json({
+            status: false,
+            message: "Server error"
+        });
+
     }
+
 }
+
 
 module.exports = {
     addState,
