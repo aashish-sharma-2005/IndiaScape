@@ -1,11 +1,14 @@
 import "./App.css";
-import socket from './socket/socket'
+import socket from "./socket/socket";
+
 import { TopNavBar } from "./screen/Navbar/index";
 import { HomeHeroPage } from "./screen/HeroPage/index";
+
 import {
     Routes,
     Route,
     useLocation,
+    useNavigate,
 } from "react-router-dom";
 
 import { Login } from "./screen/Auth/Login";
@@ -33,20 +36,38 @@ import AdminRoute from "./Guards/AdminRoutes";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 
-import { fetchStatesData, updateState } from "./store/statesSlice";
+import {
+    fetchStatesData,
+    addStateRealtime,
+    updateState,
+    deleteStateRealtime,
+    updateStateVisibility,
+    updateStateImage,
+} from "./store/statesSlice";
+
 import { fetchUser } from "./store/loginSlice";
 
 
 function App() {
-    console.log("Socket:", socket.id);
+
     const dispatch = useDispatch();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
 
-    const isAdmin = location.pathname.startsWith("/admin");
 
-    const isAuthPage = location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/verify-otp";
+    // =========================================
+    // PAGE CONDITIONS
+    // =========================================
+
+    const isAdmin =
+        location.pathname.startsWith("/admin");
+
+    const isAuthPage =
+        location.pathname === "/login" ||
+        location.pathname === "/signup" ||
+        location.pathname === "/verify-otp";
 
 
     // =========================================
@@ -59,62 +80,22 @@ function App() {
 
             try {
 
-                await dispatch(fetchUser()).unwrap();
-
-            } catch (error) {
-
-                console.log("User not authenticated");
-
-            } finally {
-
-                setLoading(false);
-
-            }
-
-        };
-
-        initializeApp();
-
-        dispatch(fetchStatesData());
-
-    }, [dispatch]);
-
-
-    // =========================================
-    // REAL-TIME STATE UPDATES
-    // =========================================
-
-    useEffect(() => {
-
-        const handleStateUpdated = (updatedState) => {
-            dispatch(updateState(updatedState));
-        };
-
-        socket.on("stateUpdated", handleStateUpdated);
-
-        return () => {
-            socket.off("stateUpdated", handleStateUpdated);
-        };
-
-    }, []);
-    useEffect(() => {
-
-        const initializeApp = async () => {
-
-            try {
-
-                // Get currently logged-in user
-                // and update Redux state
-                await dispatch(fetchUser()).unwrap();
+                // Check currently logged-in user
+                await dispatch(
+                    fetchUser()
+                ).unwrap();
 
             } catch (error) {
 
                 // User is not logged in
-                console.log("User not authenticated");
+                console.log(
+                    "User not authenticated"
+                );
 
             } finally {
 
-                // Authentication check completed
+                // VERY IMPORTANT
+                // Stop loading after auth check
                 setLoading(false);
 
             }
@@ -124,10 +105,235 @@ function App() {
 
         initializeApp();
 
-        // Fetch states data
-        dispatch(fetchStatesData());
+
+        // Fetch states from backend
+        dispatch(
+            fetchStatesData()
+        );
+
 
     }, [dispatch]);
+
+
+    // =========================================
+    // REAL-TIME STATE EVENTS
+    // =========================================
+
+    useEffect(() => {
+
+
+        // -----------------------------------------
+        // STATE ADDED
+        // -----------------------------------------
+
+        const handleStateAdded = (newState) => {
+
+            console.log(
+                "State added from server:",
+                newState
+            );
+
+            dispatch(
+                addStateRealtime(newState)
+            );
+
+        };
+
+
+        // -----------------------------------------
+        // STATE UPDATED
+        // -----------------------------------------
+
+        const handleStateUpdated = (updatedState) => {
+
+            console.log(
+                "State updated from server:",
+                updatedState
+            );
+
+            dispatch(
+                updateState(updatedState)
+            );
+
+        };
+
+
+        // -----------------------------------------
+        // STATE DELETED
+        // -----------------------------------------
+
+        const handleStateDeleted = (deletedState) => {
+
+            console.log(
+                "State deleted from server:",
+                deletedState
+            );
+
+            dispatch(
+                deleteStateRealtime(
+                    deletedState
+                )
+            );
+
+        };
+
+
+        // -----------------------------------------
+        // STATE VISIBILITY UPDATED
+        // -----------------------------------------
+
+        const handleStateVisibilityUpdated = async (updatedState) => {
+
+            console.log(
+                "State visibility updated from server:",
+                updatedState
+            );
+
+
+            // =========================================
+            // STATE HIDDEN
+            // =========================================
+
+            if (updatedState.visible === false) {
+
+                dispatch(
+                    updateStateVisibility(updatedState)
+                );
+
+
+                const currentPath =
+                    decodeURIComponent(location.pathname);
+
+                const statePath =
+                    `/dashboard/states/${updatedState.name}`;
+
+
+                if (currentPath === statePath) {
+
+                    console.log(
+                        "Current state hidden. Redirecting..."
+                    );
+
+                    navigate("/dashboard/states");
+
+                }
+
+                return;
+            }
+
+
+            // =========================================
+            // STATE SHOWN
+            // =========================================
+            // Fetch again because backend response
+            // contains complete state + photos data.
+            // =========================================
+
+            if (updatedState.visible === true) {
+
+                console.log(
+                    "State shown. Refreshing states data..."
+                );
+
+                await dispatch(
+                    fetchStatesData()
+                );
+
+            }
+
+        };
+
+
+        // -----------------------------------------
+        // PLACE UPDATED
+        // -----------------------------------------
+
+        const handlePlaceUpdated =
+            (updatedPlace) => {
+
+                console.log(
+                    "Place updated from server:",
+                    updatedPlace
+                );
+
+                dispatch(
+                    updateStateImage(
+                        updatedPlace
+                    )
+                );
+
+            };
+
+
+        // =========================================
+        // SOCKET LISTENERS
+        // =========================================
+
+        socket.on(
+            "stateAdded",
+            handleStateAdded
+        );
+
+        socket.on(
+            "stateUpdated",
+            handleStateUpdated
+        );
+
+        socket.on(
+            "stateDeleted",
+            handleStateDeleted
+        );
+
+        socket.on(
+            "stateVisibilityUpdated",
+            handleStateVisibilityUpdated
+        );
+
+        socket.on(
+            "placeUpdated",
+            handlePlaceUpdated
+        );
+
+
+        // =========================================
+        // CLEANUP
+        // =========================================
+
+        return () => {
+
+            socket.off(
+                "stateAdded",
+                handleStateAdded
+            );
+
+            socket.off(
+                "stateUpdated",
+                handleStateUpdated
+            );
+
+            socket.off(
+                "stateDeleted",
+                handleStateDeleted
+            );
+
+            socket.off(
+                "stateVisibilityUpdated",
+                handleStateVisibilityUpdated
+            );
+
+            socket.off(
+                "placeUpdated",
+                handlePlaceUpdated
+            );
+
+        };
+
+
+    }, [
+        dispatch,
+        location.pathname,
+        navigate
+    ]);
 
 
     // =========================================
@@ -135,7 +341,9 @@ function App() {
     // =========================================
 
     if (loading) {
+
         return <Loading />;
+
     }
 
 
@@ -146,51 +354,70 @@ function App() {
     return (
         <>
 
-            {/* HEADER */}
-            {!isAdmin && <TopNavBar />}
+            {/* =================================
+                HEADER
+            ================================= */}
+
+            {!isAdmin && (
+                <TopNavBar />
+            )}
 
 
-            {/* PAGE CONTENT */}
+            {/* =================================
+                PAGE CONTENT
+            ================================= */}
+
             <main
-                className={`app-main ${isAuthPage ? "auth-main" : ""
+                className={`app-main ${isAuthPage
+                        ? "auth-main"
+                        : ""
                     }`}
             >
 
                 <Routes>
 
-                    {/* =========================
+
+                    {/* =================================
                         PUBLIC HOME
-                    ========================= */}
+                    ================================= */}
 
                     <Route
                         path="/"
-                        element={<HomeHeroPage />}
+                        element={
+                            <HomeHeroPage />
+                        }
                     />
 
 
-                    {/* =========================
+                    {/* =================================
                         AUTH
-                    ========================= */}
+                    ================================= */}
 
                     <Route
                         path="/login"
-                        element={<Login />}
+                        element={
+                            <Login />
+                        }
                     />
 
                     <Route
                         path="/signup"
-                        element={<Signup />}
+                        element={
+                            <Signup />
+                        }
                     />
 
                     <Route
                         path="/verify-otp"
-                        element={<VerifyOtp />}
+                        element={
+                            <VerifyOtp />
+                        }
                     />
 
 
-                    {/* =========================
+                    {/* =================================
                         USER
-                    ========================= */}
+                    ================================= */}
 
                     <Route
                         path="/dashboard"
@@ -201,6 +428,7 @@ function App() {
                         }
                     />
 
+
                     <Route
                         path="/dashboard/states"
                         element={
@@ -210,6 +438,7 @@ function App() {
                         }
                     />
 
+
                     <Route
                         path="/dashboard/states/:state"
                         element={
@@ -218,6 +447,7 @@ function App() {
                             </UserRoute>
                         }
                     />
+
 
                     <Route
                         path="/dashboard/place/:id"
@@ -229,9 +459,9 @@ function App() {
                     />
 
 
-                    {/* =========================
+                    {/* =================================
                         ADMIN
-                    ========================= */}
+                    ================================= */}
 
                     <Route
                         path="/admin"
@@ -244,29 +474,37 @@ function App() {
 
                         <Route
                             index
-                            element={<Admin />}
+                            element={
+                                <Admin />
+                            }
                         />
 
                         <Route
                             path="places"
-                            element={<AdminPlaces />}
+                            element={
+                                <AdminPlaces />
+                            }
                         />
 
                         <Route
                             path="states"
-                            element={<AdminStates />}
+                            element={
+                                <AdminStates />
+                            }
                         />
 
                     </Route>
 
 
-                    {/* =========================
+                    {/* =================================
                         404
-                    ========================= */}
+                    ================================= */}
 
                     <Route
                         path="*"
-                        element={<NotFound />}
+                        element={
+                            <NotFound />
+                        }
                     />
 
                 </Routes>
@@ -274,11 +512,17 @@ function App() {
             </main>
 
 
-            {/* FOOTER */}
-            {!isAdmin && <Footer />}
+            {/* =================================
+                FOOTER
+            ================================= */}
+
+            {!isAdmin && (
+                <Footer />
+            )}
 
         </>
     );
+
 }
 
 

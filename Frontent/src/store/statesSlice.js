@@ -1,6 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 
+// =========================================
+// FETCH STATES DATA
+// =========================================
+
 export const fetchStatesData = createAsyncThunk(
     "states/fetchStatesData",
 
@@ -43,11 +47,8 @@ export const fetchStatesData = createAsyncThunk(
 
 
             return {
-
                 famous: result.places || [],
-
                 states: result.states || [],
-
             };
 
 
@@ -72,11 +73,8 @@ const statesSlice = createSlice({
     initialState: {
 
         famous: [],
-
         states: [],
-
         loading: false,
-
         error: "",
 
     },
@@ -86,7 +84,29 @@ const statesSlice = createSlice({
 
 
         // =========================================
-        // REAL-TIME STATE UPDATE
+        // STATE ADDED
+        // =========================================
+
+        addStateRealtime: (state, action) => {
+
+            const newState = action.payload;
+
+            const alreadyExists = state.states.some(
+                (item) => item._id === newState._id
+            );
+
+
+            if (!alreadyExists && newState.visible !== false) {
+
+                state.states.push(newState);
+
+            }
+
+        },
+
+
+        // =========================================
+        // STATE UPDATED
         // =========================================
 
         updateState: (state, action) => {
@@ -101,10 +121,128 @@ const statesSlice = createSlice({
 
             if (index !== -1) {
 
-                state.states[index] =
-                    updatedState;
+                state.states[index] = {
+                    ...state.states[index],
+                    ...updatedState,
+                };
 
             }
+
+        },
+
+
+        // =========================================
+        // STATE DELETED
+        // =========================================
+
+        deleteStateRealtime: (state, action) => {
+
+            const deletedStateId =
+                action.payload?._id ||
+                action.payload;
+
+
+            state.states =
+                state.states.filter(
+                    (item) =>
+                        item._id !== deletedStateId
+                );
+
+
+            // Also remove places belonging
+            // to the deleted state
+
+            state.famous =
+                state.famous.filter(
+                    (place) => {
+
+                        const placeStateId =
+                            place.state_id?._id ||
+                            place.state_id;
+
+                        return (
+                            placeStateId !==
+                            deletedStateId
+                        );
+
+                    }
+                );
+
+        },
+
+        // REAL-TIME STATE VISIBILITY UPDATE
+        // =========================================
+
+        updateStateVisibility: (state, action) => {
+
+            const updatedState = action.payload;
+
+            const index = state.states.findIndex(
+                (item) => item._id === updatedState._id
+            );
+
+
+            // =========================================
+            // STATE ALREADY EXISTS
+            // =========================================
+
+            if (index !== -1) {
+
+                state.states[index] = {
+                    ...state.states[index],
+                    ...updatedState
+                };
+
+                return;
+            }
+
+
+            // =========================================
+            // STATE DOES NOT EXIST
+            // BUT ADMIN SHOWED IT
+            // =========================================
+
+            if (updatedState.visible === true) {
+
+                state.states.push(updatedState);
+
+            }
+
+        },
+
+
+        // =========================================
+        // UPDATE STATE IMAGE FROM PLACE
+        // =========================================
+
+        updateStateImage: (state, action) => {
+
+            const updatedPlace = action.payload;
+
+            const stateId =
+                updatedPlace?.state_id?._id ||
+                updatedPlace?.state_id;
+
+
+            if (!stateId) {
+                return;
+            }
+
+
+            const stateIndex =
+                state.states.findIndex(
+                    (item) =>
+                        item._id === stateId
+                );
+
+
+            if (stateIndex === -1) {
+                return;
+            }
+
+
+            state.states[stateIndex].photos =
+                updatedPlace.photos || [];
 
         },
 
@@ -125,7 +263,6 @@ const statesSlice = createSlice({
                 (state) => {
 
                     state.loading = true;
-
                     state.error = "";
 
                 }
@@ -175,7 +312,11 @@ const statesSlice = createSlice({
 
 
 export const {
-    updateState
+    addStateRealtime,
+    updateState,
+    deleteStateRealtime,
+    updateStateVisibility,
+    updateStateImage,
 } = statesSlice.actions;
 
 

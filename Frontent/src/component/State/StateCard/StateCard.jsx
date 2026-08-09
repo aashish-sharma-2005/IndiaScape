@@ -3,51 +3,37 @@ import "./stateCard.css";
 
 function StateCard({ state }) {
 
-    const navigate = useNavigate(); 
-    const getImage = () => {
+    const navigate = useNavigate();
 
-        if (state?.photos?.length > 0) {
-
-            const photo = state.photos[0];
-
-            if (typeof photo === "string") {
-                return photo;
-            }
-
-            return photo?.url || "";
-        }
-
-        return (
-            state?.image ||
-            state?.photo ||
-            state?.imageUrl ||
-            state?.photoUrl ||
-            ""
-        );
-    };
-
-    const image = getImage();
+    const image = state?.photos?.[0]?.url || "";
 
     const handleExplore = () => {
+
         navigate(
             `/dashboard/states/${encodeURIComponent(state.name)}`
         );
+
     };
 
     return (
+
         <article className="state-card">
 
             <div className="state-card-image">
 
                 {image ? (
+
                     <img
                         src={image}
                         alt={state.name}
                     />
+
                 ) : (
+
                     <div className="state-image-placeholder">
                         IndiaScape
                     </div>
+
                 )}
 
                 <div className="state-card-overlay"></div>
@@ -62,9 +48,11 @@ function StateCard({ state }) {
                 </h3>
 
                 {state.description && (
+
                     <p>
                         {state.description}
                     </p>
+
                 )}
 
             </div>
@@ -84,6 +72,7 @@ function StateCard({ state }) {
             </div>
 
         </article>
+
     );
 }
 

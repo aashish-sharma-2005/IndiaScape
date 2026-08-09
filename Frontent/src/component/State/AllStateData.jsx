@@ -20,11 +20,15 @@ export function AllStateData() {
 
     const filteredStates = useMemo(() => {
 
+        const visibleStates = states.filter(
+            (state) => state.visible !== false
+        );
+
         if (activeCategory === "All") {
-            return states;
+            return visibleStates;
         }
 
-        return states.filter(
+        return visibleStates.filter(
             (state) =>
                 state.category?.toLowerCase() ===
                 activeCategory.toLowerCase()
