@@ -2,9 +2,11 @@ import Carousel from "react-bootstrap/Carousel";
 
 function Images({ data = [], name }) {
     return (
-        <Carousel interval={3000}>
+        <Carousel>
             {data.map((photo, index) => (
-                <Carousel.Item key={photo.publicId || index}>
+                <Carousel.Item
+                    key={photo.publicId || photo._id || index}
+                >
                     <img
                         src={photo.url}
                         alt={`${name} ${index + 1}`}

@@ -3,61 +3,50 @@ const Famous = require("../../Models/famous");
 
 const { getSocketIO } = require("../../Config/socket");
 
-
-// =========================================
+// =====================================================
 // ADD STATE
-// =========================================
+// =====================================================
 
 async function addState(req, res) {
-
     try {
+        const name = req.body.name?.trim();
 
-        const { name } = req.body;
-
-        if (!name?.trim()) {
-
+        if (!name) {
             return res.status(400).json({
                 status: false,
                 message: "State name is required"
             });
-
         }
 
-
         const exists = await State.findOne({
-            name: name.trim()
+            name: name
         });
 
         if (exists) {
-
             return res.status(400).json({
                 status: false,
                 message: "State already exists"
             });
-
         }
 
-
         const state = await State.create({
-            name: name.trim()
+            name
         });
 
-
-        // =========================================
-        // REAL-TIME STATE ADDED
-        // =========================================
+        // =================================================
+        // SOCKET
+        // =================================================
 
         const io = getSocketIO();
 
         if (io) {
+            io.emit("stateAdded", state);
 
-            io.emit(
-                "stateAdded",
-                state
+            console.log(
+                "Socket: stateAdded",
+                state._id
             );
-
         }
-
 
         return res.status(201).json({
             status: true,
@@ -65,79 +54,80 @@ async function addState(req, res) {
             state
         });
 
-
     } catch (error) {
-
-        console.log(error);
+        console.log("Add State Error:", error);
 
         return res.status(500).json({
             status: false,
             message: "Server Error"
         });
-
     }
-
 }
 
 
-// =========================================
+// =====================================================
 // UPDATE STATE
-// =========================================
+// =====================================================
 
 async function updateState(req, res) {
-
     try {
-
         const { id } = req.params;
-        const { name } = req.body;
+        const name = req.body.name?.trim();
 
-
-        if (!name?.trim()) {
-
+        if (!name) {
             return res.status(400).json({
                 status: false,
                 message: "State name is required"
             });
-
         }
 
+        const existingState = await State.findById(id);
 
-        const state = await State.findByIdAndUpdate(
-            id,
-            {
-                name: name.trim()
-            },
-            {
-                new: true
-            }
-        );
-
-
-        if (!state) {
-
+        if (!existingState) {
             return res.status(404).json({
                 status: false,
                 message: "State not found"
             });
-
         }
 
+        // Prevent duplicate state names
+        const duplicate = await State.findOne({
+            name,
+            _id: { $ne: id }
+        });
 
-        // =========================================
-        // REAL-TIME STATE UPDATE
-        // =========================================
+        if (duplicate) {
+            return res.status(400).json({
+                status: false,
+                message: "State already exists"
+            });
+        }
+
+        const state = await State.findByIdAndUpdate(
+            id,
+            {
+                name
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        // =================================================
+        // SOCKET
+        // =================================================
 
         const io = getSocketIO();
 
         if (io) {
+            io.emit("stateUpdated", state);
 
-            io.emit(
-                "stateUpdated",
-                state
+            console.log(
+                "Socket: stateUpdated",
+                state._id
             );
-
         }
-
 
         return res.status(200).json({
             status: true,
@@ -145,115 +135,107 @@ async function updateState(req, res) {
             state
         });
 
-
     } catch (error) {
-
-        console.log(error);
+        console.log("Update State Error:", error);
 
         return res.status(500).json({
             status: false,
             message: "Server Error"
         });
-
     }
-
 }
 
 
-// =========================================
+// =====================================================
 // DELETE STATE
-// =========================================
+// =====================================================
 
 async function deleteState(req, res) {
-
     try {
-
         const { id } = req.params;
 
+        const state = await State.findById(id);
+
+        if (!state) {
+            return res.status(404).json({
+                status: false,
+                message: "State not found"
+            });
+        }
+
+        // =================================================
+        // CHECK PLACES
+        // =================================================
 
         const placeExists = await Famous.findOne({
             state_id: id
         });
 
-
         if (placeExists) {
-
             return res.status(400).json({
                 status: false,
                 message:
                     "This state contains places. Delete those places first."
             });
-
         }
 
+        await State.findByIdAndDelete(id);
 
-        const state = await State.findByIdAndDelete(id);
-
-
-        if (!state) {
-
-            return res.status(404).json({
-                status: false,
-                message: "State not found"
-            });
-
-        }
-
-
-        // =========================================
-        // REAL-TIME STATE DELETE
-        // =========================================
+        // =================================================
+        // SOCKET
+        // =================================================
 
         const io = getSocketIO();
 
         if (io) {
+            io.emit("stateDeleted", {
+                _id: id,
+                name: state.name
+            });
 
-            io.emit(
-                "stateDeleted",
-                {
-                    _id: id
-                }
+            console.log(
+                "Socket: stateDeleted",
+                id
             );
-
         }
-
 
         return res.status(200).json({
             status: true,
             message: "State deleted successfully"
         });
 
-
     } catch (error) {
-
-        console.log(error);
+        console.log("Delete State Error:", error);
 
         return res.status(500).json({
             status: false,
             message: "Server Error"
         });
-
     }
-
 }
 
 
-// =========================================
+// =====================================================
 // TOGGLE STATE VISIBILITY
-// =========================================
-
-// =========================================
-// TOGGLE STATE VISIBILITY
-// =========================================
+// =====================================================
 
 async function toggleStateVisibility(req, res) {
-
     try {
-        
-
         const { id } = req.params;
-        const { visible } = req.body;
 
+        // FormData / JSON can sometimes send strings
+        let visible = req.body.visible;
+
+        if (typeof visible === "string") {
+            visible = visible === "true";
+        }
+
+        if (typeof visible !== "boolean") {
+            return res.status(400).json({
+                status: false,
+                message: "Visibility must be true or false"
+            });
+        }
 
         const state = await State.findByIdAndUpdate(
             id,
@@ -261,63 +243,54 @@ async function toggleStateVisibility(req, res) {
                 visible
             },
             {
-                new: true
+                new: true,
+                runValidators: true
             }
         );
 
-
         if (!state) {
-
             return res.status(404).json({
                 status: false,
                 message: "State not found"
             });
-
         }
 
-
-        // =========================================
-        // REAL-TIME VISIBILITY UPDATE
-        // =========================================
+        // =================================================
+        // SOCKET
+        // =================================================
 
         const io = getSocketIO();
 
         if (io) {
-
             io.emit(
                 "stateVisibilityUpdated",
                 state
             );
 
+            console.log(
+                "Socket: stateVisibilityUpdated",
+                state._id,
+                state.visible
+            );
         }
 
-
         return res.status(200).json({
-
             status: true,
-
-            message:
-                "State visibility updated",
-
+            message: "State visibility updated",
             state
-
         });
-
 
     } catch (error) {
-
-        console.log(error);
+        console.log(
+            "Toggle State Visibility Error:",
+            error
+        );
 
         return res.status(500).json({
-
             status: false,
-
-            message: "Server error"
-
+            message: "Server Error"
         });
-
     }
-
 }
 
 

@@ -1,23 +1,57 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+
 const placeSlice = createSlice({
+
     name: "places",
 
     initialState: {
+
+        // All places
+        places: [],
+
+        // Only featured places
         featuredPlaces: [],
+
         loading: false
+
     },
+
 
     reducers: {
 
+        // =========================================
+        // SET ALL PLACES
+        // =========================================
+
         setPlaces: (state, action) => {
-            state.featuredPlaces = action.payload || [];
+
+            const places =
+                action.payload || [];
+
+            state.places = places;
+
+            state.featuredPlaces =
+                places.filter(
+                    (place) => place.featured
+                );
+
             state.loading = false;
+
         },
 
+
+        // =========================================
+        // LOADING
+        // =========================================
+
         setLoading: (state, action) => {
-            state.loading = action.payload;
+
+            state.loading =
+                action.payload;
+
         },
+
 
         // =========================================
         // PLACE ADDED
@@ -25,22 +59,51 @@ const placeSlice = createSlice({
 
         addPlaceRealtime: (state, action) => {
 
-            const place = action.payload;
+            const place =
+                action.payload;
 
-            // Only featured places are shown
-            // in HomeSlider
-            if (!place?.featured) {
+            if (!place?._id) {
                 return;
             }
 
-            const exists = state.featuredPlaces.some(
-                (item) => item._id === place._id
-            );
+
+            // Prevent duplicate
+            const exists =
+                state.places.some(
+                    (item) =>
+                        item._id === place._id
+                );
+
 
             if (!exists) {
-                state.featuredPlaces.push(place);
+
+                state.places.push(place);
+
             }
+
+
+            // Add to featured list
+            if (place.featured) {
+
+                const featuredExists =
+                    state.featuredPlaces.some(
+                        (item) =>
+                            item._id === place._id
+                    );
+
+
+                if (!featuredExists) {
+
+                    state.featuredPlaces.push(
+                        place
+                    );
+
+                }
+
+            }
+
         },
+
 
         // =========================================
         // PLACE UPDATED
@@ -48,64 +111,134 @@ const placeSlice = createSlice({
 
         updatePlaceRealtime: (state, action) => {
 
-            const updatedPlace = action.payload;
+            const updatedPlace =
+                action.payload;
+
 
             if (!updatedPlace?._id) {
                 return;
             }
 
-            const index = state.featuredPlaces.findIndex(
-                (item) => item._id === updatedPlace._id
-            );
 
-            // If place is no longer featured,
-            // remove it from HomeSlider
+            // =========================================
+            // UPDATE ALL PLACES
+            // =========================================
+
+            const placeIndex =
+                state.places.findIndex(
+                    (item) =>
+                        item._id ===
+                        updatedPlace._id
+                );
+
+
+            if (placeIndex !== -1) {
+
+                state.places[placeIndex] =
+                    updatedPlace;
+
+            } else {
+
+                state.places.push(
+                    updatedPlace
+                );
+
+            }
+
+
+            // =========================================
+            // FEATURED LIST
+            // =========================================
+
+            const featuredIndex =
+                state.featuredPlaces.findIndex(
+                    (item) =>
+                        item._id ===
+                        updatedPlace._id
+                );
+
+
+            // Place is no longer featured
             if (!updatedPlace.featured) {
 
-                if (index !== -1) {
-                    state.featuredPlaces.splice(index, 1);
+                if (featuredIndex !== -1) {
+
+                    state.featuredPlaces.splice(
+                        featuredIndex,
+                        1
+                    );
+
                 }
 
                 return;
-            }
-
-            // Place is already featured
-            // → update existing data
-            if (index !== -1) {
-
-                state.featuredPlaces[index] = updatedPlace;
 
             }
-            // Place became featured
-            // → add it to HomeSlider
+
+
+            // Already featured → update
+            if (featuredIndex !== -1) {
+
+                state.featuredPlaces[
+                    featuredIndex
+                ] = updatedPlace;
+
+            }
+
+            // Became featured → add
             else {
 
-                state.featuredPlaces.push(updatedPlace);
+                state.featuredPlaces.push(
+                    updatedPlace
+                );
+
             }
+
         },
+
 
         // =========================================
         // PLACE DELETED
         // =========================================
 
-        deletePlaceRealtime: (state, action) => {
+        deletePlaceRealtime: (
+            state,
+            action
+        ) => {
 
-            const placeId = action.payload;
+            const placeId =
+                action.payload;
+
+
+            state.places =
+                state.places.filter(
+                    (item) =>
+                        item._id !== placeId
+                );
+
 
             state.featuredPlaces =
                 state.featuredPlaces.filter(
-                    (item) => item._id !== placeId
+                    (item) =>
+                        item._id !== placeId
                 );
+
         }
+
     }
+
 });
 
+
 export const {
+
     setPlaces,
     setLoading,
+
     addPlaceRealtime,
     updatePlaceRealtime,
     deletePlaceRealtime
+
 } = placeSlice.actions;
+
 
 export default placeSlice.reducer;

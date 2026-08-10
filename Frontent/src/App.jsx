@@ -26,6 +26,11 @@ import AdminStates from "./component/Admin/AdminStates";
 import { OneState } from "./screen/State/OneState";
 import { Details } from "./screen/Details";
 
+// =========================================
+// FAVORITES
+// =========================================
+import FavoritePage from "./screen/Favorite";
+
 import Footer from "./screen/Navbar/Footer";
 import NotFound from "./screen/NotFound/index";
 import Loading from "./screen/Loading/";
@@ -42,8 +47,13 @@ import {
     updateState,
     deleteStateRealtime,
     updateStateVisibility,
-    updateStateImage,
 } from "./store/statesSlice";
+
+import {
+    addPlaceRealtime,
+    updatePlaceRealtime,
+    deletePlaceRealtime,
+} from "./store/placesSlice";
 
 import { fetchUser } from "./store/loginSlice";
 
@@ -111,25 +121,23 @@ function App() {
             fetchStatesData()
         );
 
-
     }, [dispatch]);
 
 
     // =========================================
-    // REAL-TIME STATE EVENTS
+    // REAL-TIME EVENTS
     // =========================================
 
     useEffect(() => {
 
-
-        // -----------------------------------------
+        // =================================================
         // STATE ADDED
-        // -----------------------------------------
+        // =================================================
 
         const handleStateAdded = (newState) => {
 
             console.log(
-                "State added from server:",
+                "Socket → stateAdded:",
                 newState
             );
 
@@ -140,14 +148,14 @@ function App() {
         };
 
 
-        // -----------------------------------------
+        // =================================================
         // STATE UPDATED
-        // -----------------------------------------
+        // =================================================
 
         const handleStateUpdated = (updatedState) => {
 
             console.log(
-                "State updated from server:",
+                "Socket → stateUpdated:",
                 updatedState
             );
 
@@ -158,14 +166,14 @@ function App() {
         };
 
 
-        // -----------------------------------------
+        // =================================================
         // STATE DELETED
-        // -----------------------------------------
+        // =================================================
 
         const handleStateDeleted = (deletedState) => {
 
             console.log(
-                "State deleted from server:",
+                "Socket → stateDeleted:",
                 deletedState
             );
 
@@ -178,96 +186,142 @@ function App() {
         };
 
 
-        // -----------------------------------------
-        // STATE VISIBILITY UPDATED
-        // -----------------------------------------
+        // =================================================
+        // STATE VISIBILITY
+        // =================================================
 
-        const handleStateVisibilityUpdated = async (updatedState) => {
+        const handleStateVisibilityUpdated = (
+            updatedState
+        ) => {
 
             console.log(
-                "State visibility updated from server:",
+                "Socket → stateVisibilityUpdated:",
                 updatedState
             );
 
+            dispatch(
+                updateStateVisibility(
+                    updatedState
+                )
+            );
 
-            // =========================================
-            // STATE HIDDEN
-            // =========================================
 
-            if (updatedState.visible === false) {
+            // =============================================
+            // If current state became hidden
+            // =============================================
 
-                dispatch(
-                    updateStateVisibility(updatedState)
-                );
-
+            if (
+                updatedState.visible === false
+            ) {
 
                 const currentPath =
-                    decodeURIComponent(location.pathname);
+                    decodeURIComponent(
+                        location.pathname
+                    );
 
                 const statePath =
                     `/dashboard/states/${updatedState.name}`;
 
 
-                if (currentPath === statePath) {
+                if (
+                    currentPath === statePath
+                ) {
 
                     console.log(
-                        "Current state hidden. Redirecting..."
+                        "Current state hidden → redirect"
                     );
 
-                    navigate("/dashboard/states");
+                    navigate(
+                        "/dashboard/states"
+                    );
 
                 }
-
-                return;
-            }
-
-
-            // =========================================
-            // STATE SHOWN
-            // =========================================
-            // Fetch again because backend response
-            // contains complete state + photos data.
-            // =========================================
-
-            if (updatedState.visible === true) {
-
-                console.log(
-                    "State shown. Refreshing states data..."
-                );
-
-                await dispatch(
-                    fetchStatesData()
-                );
 
             }
 
         };
 
 
-        // -----------------------------------------
+        // =================================================
+        // PLACE ADDED
+        // =================================================
+
+        const handlePlaceAdded = (newPlace) => {
+
+            console.log(
+                "Socket → placeAdded:",
+                newPlace
+            );
+
+            dispatch(
+                addPlaceRealtime(
+                    newPlace
+                )
+            );
+
+        };
+
+
+        // =================================================
         // PLACE UPDATED
-        // -----------------------------------------
+        // =================================================
 
-        const handlePlaceUpdated =
-            (updatedPlace) => {
+        const handlePlaceUpdated = (data) => {
 
-                console.log(
-                    "Place updated from server:",
-                    updatedPlace
-                );
+            console.log(
+                "Socket → placeUpdated:",
+                data
+            );
 
-                dispatch(
-                    updateStateImage(
-                        updatedPlace
-                    )
-                );
+            dispatch(
+                updatePlaceRealtime(
+                    data.place
+                )
+            );
 
-            };
+        };
 
 
-        // =========================================
-        // SOCKET LISTENERS
-        // =========================================
+        // =================================================
+        // PLACE DELETED
+        // =================================================
+
+        const handlePlaceDeleted = (deletedPlace) => {
+
+            console.log(
+                "Socket → placeDeleted:",
+                deletedPlace
+            );
+
+            dispatch(
+                deletePlaceRealtime(
+                    deletedPlace._id
+                )
+            );
+
+        };
+
+
+        // =================================================
+        // DRAFT ADDED
+        // =================================================
+
+        const handleDraftAdded = (newDraft) => {
+
+            console.log(
+                "Socket → draftAdded:",
+                newDraft
+            );
+
+            // We'll connect this to admin draft Redux
+            // after checking your admin data structure.
+
+        };
+
+
+        // =================================================
+        // REGISTER SOCKET LISTENERS
+        // =================================================
 
         socket.on(
             "stateAdded",
@@ -289,15 +343,32 @@ function App() {
             handleStateVisibilityUpdated
         );
 
+
+        socket.on(
+            "placeAdded",
+            handlePlaceAdded
+        );
+
         socket.on(
             "placeUpdated",
             handlePlaceUpdated
         );
 
+        socket.on(
+            "placeDeleted",
+            handlePlaceDeleted
+        );
 
-        // =========================================
+
+        socket.on(
+            "draftAdded",
+            handleDraftAdded
+        );
+
+
+        // =================================================
         // CLEANUP
-        // =========================================
+        // =================================================
 
         return () => {
 
@@ -321,13 +392,29 @@ function App() {
                 handleStateVisibilityUpdated
             );
 
+
+            socket.off(
+                "placeAdded",
+                handlePlaceAdded
+            );
+
             socket.off(
                 "placeUpdated",
                 handlePlaceUpdated
             );
 
-        };
+            socket.off(
+                "placeDeleted",
+                handlePlaceDeleted
+            );
 
+
+            socket.off(
+                "draftAdded",
+                handleDraftAdded
+            );
+
+        };
 
     }, [
         dispatch,
@@ -369,8 +456,8 @@ function App() {
 
             <main
                 className={`app-main ${isAuthPage
-                        ? "auth-main"
-                        : ""
+                    ? "auth-main"
+                    : ""
                     }`}
             >
 
@@ -454,6 +541,20 @@ function App() {
                         element={
                             <UserRoute>
                                 <Details />
+                            </UserRoute>
+                        }
+                    />
+
+
+                    {/* =================================
+                        FAVORITES
+                    ================================= */}
+
+                    <Route
+                        path="/dashboard/favorites"
+                        element={
+                            <UserRoute>
+                                <FavoritePage />
                             </UserRoute>
                         }
                     />

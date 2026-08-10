@@ -9,6 +9,7 @@ function AdminPlaces() {
 
     const navigate = useNavigate();
 
+
     const {
         places,
         setAdminData
@@ -21,73 +22,182 @@ function AdminPlaces() {
     const [filter, setFilter] = useState("all");
     const [sort, setSort] = useState("latest");
 
+
     const featuredCount = places.filter(
         (place) => place.featured
     ).length;
+
+
     const filteredPlaces = places
         .filter((place) => {
 
-            const value = search.toLowerCase();
+            const value =
+                search.toLowerCase();
+
 
             const matchSearch =
-                place.name?.toLowerCase().includes(value) ||
-                place.title?.toLowerCase().includes(value) ||
-                place.state_id?.name?.toLowerCase().includes(value);
+                place.name
+                    ?.toLowerCase()
+                    .includes(value) ||
+
+                place.title
+                    ?.toLowerCase()
+                    .includes(value) ||
+
+                place.state_id?.name
+                    ?.toLowerCase()
+                    .includes(value);
+
 
             const matchFilter =
                 filter === "all" ||
-                (filter === "featured" && place.featured) ||
-                (filter === "normal" && !place.featured);
 
-            return matchSearch && matchFilter;
+                (
+                    filter === "featured" &&
+                    place.featured
+                ) ||
+
+                (
+                    filter === "normal" &&
+                    !place.featured
+                );
+
+
+            return (
+                matchSearch &&
+                matchFilter
+            );
 
         })
         .sort((a, b) => {
 
             if (sort === "name") {
-                return a.name.localeCompare(b.name);
+
+                return a.name.localeCompare(
+                    b.name
+                );
+
             }
+
 
             if (sort === "views") {
-                return (b.views || 0) - (a.views || 0);
+
+                return (
+                    (b.views || 0) -
+                    (a.views || 0)
+                );
+
             }
+
 
             if (sort === "featured") {
-                return b.featured - a.featured;
+
+                return (
+                    b.featured -
+                    a.featured
+                );
+
             }
 
-            return new Date(b.createdAt) - new Date(a.createdAt);
+
+            return (
+                new Date(b.createdAt) -
+                new Date(a.createdAt)
+            );
 
         });
 
+
+    // =========================================
+    // DELETE PLACE
+    // =========================================
+
     const handleDelete = async (id) => {
 
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete this place?"
-        );
+        const confirmDelete =
+            window.confirm(
+                "Are you sure you want to delete this place?"
+            );
 
-        if (!confirmDelete) return;
+
+        if (!confirmDelete) {
+            return;
+        }
 
 
-        const response = await fetch(
-            `http://localhost:3000/admin/place/${id}`,
-            {
-                method: "DELETE",
-                credentials: "include"
+        try {
+
+            const response = await fetch(
+                `http://localhost:3000/admin/place/${id}`,
+                {
+                    method: "DELETE",
+                    credentials: "include"
+                }
+            );
+
+
+            const result =
+                await response.json();
+
+
+            if (result.status) {
+
+                toast.success(
+                    "Place deleted successfully"
+                );
+
+
+                // =================================
+                // UPDATE ADMIN DATA
+                // =================================
+
+                setAdminData((prev) => ({
+
+                    ...prev,
+
+                    places:
+                        prev.places.filter(
+                            (place) =>
+                                place._id !== id
+                        ),
+
+                    featuredPlaces:
+                        prev.featuredPlaces.filter(
+                            (place) =>
+                                place._id !== id
+                        )
+
+                }));
+
+            } else {
+
+                toast.error(
+                    result.message ||
+                    "Failed to delete place"
+                );
+
             }
-        );
 
+        } catch (error) {
 
-        const result = await response.json();
+            console.log(
+                "Delete place error:",
+                error
+            );
 
-
-        if (result.status) {
-
-            window.location.reload();
+            toast.error(
+                "Something went wrong"
+            );
 
         }
 
     };
+
+
+    // =========================================
+    // TOGGLE FEATURED
+    // =========================================
+
     const toggleFeatured = async (place) => {
 
         try {
@@ -96,47 +206,98 @@ function AdminPlaces() {
                 `http://localhost:3000/admin/place/${place._id}/featured`,
                 {
                     method: "PUT",
+
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type":
+                            "application/json"
                     },
+
                     credentials: "include",
+
                     body: JSON.stringify({
-                        featured: !place.featured
+                        featured:
+                            !place.featured
                     })
+
                 }
             );
 
 
-            const result = await response.json();
+            const result =
+                await response.json();
 
 
             if (result.status) {
-                toast.success("Featured updated");
-                setAdminData((prev) => ({
-                    ...prev,
-                    places: prev.places.map((item) =>
-                        item._id === place._id
-                            ? { ...item, featured: !item.featured }
-                            : item
-                    )
-                }));
-            } else {
-                toast.error(result.message);
-            }
 
+                toast.success(
+                    "Featured updated"
+                );
+
+
+                setAdminData((prev) => ({
+
+                    ...prev,
+
+                    places:
+                        prev.places.map(
+                            (item) =>
+                                item._id === place._id
+                                    ? {
+                                        ...item,
+                                        featured:
+                                            !item.featured
+                                    }
+                                    : item
+                        ),
+
+                    featuredPlaces:
+                        !place.featured
+
+                            ? [
+                                ...prev.featuredPlaces,
+                                {
+                                    ...place,
+                                    featured: true
+                                }
+                            ]
+
+                            : prev.featuredPlaces.filter(
+                                (item) =>
+                                    item._id !==
+                                    place._id
+                            )
+
+                }));
+
+            } else {
+
+                toast.error(
+                    result.message
+                );
+
+            }
 
         } catch (error) {
 
             console.log(error);
 
+            toast.error(
+                "Something went wrong"
+            );
+
         }
 
     };
+
 
     return (
 
         <section className="places-page">
 
+
+            {/* =================================
+                HEADER
+            ================================= */}
 
             <div className="places-page-header">
 
@@ -159,10 +320,11 @@ function AdminPlaces() {
 
                 <div className="places-header-actions">
 
-
                     <button
                         className="back-dashboard-btn"
-                        onClick={() => navigate("/admin")}
+                        onClick={() =>
+                            navigate("/admin")
+                        }
                     >
                         ← Dashboard
                     </button>
@@ -170,17 +332,21 @@ function AdminPlaces() {
 
                     <button
                         className="add-place-btn"
-                        onClick={() => setShowAddModal(true)}
+                        onClick={() =>
+                            setShowAddModal(true)
+                        }
                     >
                         + Add New Place
                     </button>
-
 
                 </div>
 
             </div>
 
 
+            {/* =================================
+                TOOLBAR
+            ================================= */}
 
             <div className="places-toolbar">
 
@@ -194,16 +360,25 @@ function AdminPlaces() {
                         type="text"
                         placeholder="Search by place, title or state..."
                         value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) =>
+                            setSearch(
+                                e.target.value
+                            )
+                        }
                     />
 
-                    {
-                        search && (
-                            <button onClick={() => setSearch("")}>
-                                ×
-                            </button>
-                        )
-                    }
+
+                    {search && (
+
+                        <button
+                            onClick={() =>
+                                setSearch("")
+                            }
+                        >
+                            ×
+                        </button>
+
+                    )}
 
                 </div>
 
@@ -213,10 +388,16 @@ function AdminPlaces() {
                     <select
                         value={filter}
                         onChange={(e) => {
-                            setFilter(e.target.value);
+
+                            setFilter(
+                                e.target.value
+                            );
+
                             setSort("latest");
+
                         }}
                     >
+
                         <option value="all">
                             All Places
                         </option>
@@ -234,8 +415,13 @@ function AdminPlaces() {
 
                     <select
                         value={sort}
-                        onChange={(e) => setSort(e.target.value)}
+                        onChange={(e) =>
+                            setSort(
+                                e.target.value
+                            )
+                        }
                     >
+
                         <option value="latest">
                             Latest
                         </option>
@@ -260,38 +446,42 @@ function AdminPlaces() {
             </div>
 
 
-
+            {/* =================================
+                PLACES
+            ================================= */}
 
             <div className="places-list">
 
-
-                {
-                    filteredPlaces.map((place) => (
+                {filteredPlaces.map(
+                    (place) => (
 
                         <div
                             className="place-row"
                             key={place._id}
                         >
 
-
                             <div className="place-image-box">
 
                                 <img
-                                    src={place.photos?.[0]?.url}
+                                    src={
+                                        place.photos?.[0]?.url
+                                    }
                                     alt=""
                                     loading="lazy"
+
                                     onError={(e) => {
-                                        e.currentTarget.style.display = "none";
+
+                                        e.currentTarget.style.display =
+                                            "none";
+
                                     }}
+
                                 />
 
                             </div>
 
 
-
-
                             <div className="place-row-info">
-
 
                                 <h3>
                                     {place.name}
@@ -304,119 +494,137 @@ function AdminPlaces() {
 
 
                                 <span>
-                                    📍 {place.state_id?.name}
+
+                                    📍{" "}
+                                    {place.state_id?.name}
+
                                     {!place.state_id?.visible && (
-                                        <small className="hidden-state-badge">Hidden</small>
+
+                                        <small className="hidden-state-badge">
+                                            Hidden
+                                        </small>
+
                                     )}
+
                                 </span>
 
-
                             </div>
+
+
                             <label className="featured-toggle">
 
                                 <input
                                     type="checkbox"
-                                    checked={place.featured || false}
-                                    onChange={() => toggleFeatured(place)}
+                                    checked={
+                                        place.featured ||
+                                        false
+                                    }
+                                    onChange={() =>
+                                        toggleFeatured(
+                                            place
+                                        )
+                                    }
                                 />
 
                                 Featured
 
                             </label>
-                            <div className="place-row-views">
 
+
+                            <div className="place-row-views">
 
                                 <small>
                                     Views
                                 </small>
 
-
                                 <strong>
                                     {place.views || 0}
                                 </strong>
 
-
                             </div>
-
-
-
 
 
                             <div className="place-row-actions">
 
-
                                 <button
-
                                     onClick={() => {
 
-                                        setEditPlace(place);
+                                        setEditPlace(
+                                            place
+                                        );
 
-                                        setShowAddModal(true);
+                                        setShowAddModal(
+                                            true
+                                        );
 
                                     }}
-
                                 >
                                     ✎
                                 </button>
-                                <button onClick={() => handleDelete(place._id)}>
+
+
+                                <button
+                                    onClick={() =>
+                                        handleDelete(
+                                            place._id
+                                        )
+                                    }
+                                >
                                     🗑
                                 </button>
+
                             </div>
-
-
-
-                        </div>
-
-                    ))
-                }
-
-
-
-                {
-                    filteredPlaces.length === 0 && (
-
-                        <div className="empty-search">
-
-                            🔎
-
-                            <p>
-                                No place found
-                            </p>
 
                         </div>
 
                     )
-                }
+                )}
 
 
+                {filteredPlaces.length === 0 && (
+
+                    <div className="empty-search">
+
+                        🔎
+
+                        <p>
+                            No place found
+                        </p>
+
+                    </div>
+
+                )}
 
             </div>
 
 
+            {/* =================================
+                ADD / EDIT MODAL
+            ================================= */}
 
+            {showAddModal && (
 
+                <AddPlace
 
-            {
-                showAddModal && (
+                    editPlace={
+                        editPlace
+                    }
 
-                    <AddPlace
+                    onClose={() => {
 
-                        editPlace={editPlace}
+                        setShowAddModal(
+                            false
+                        );
 
-                        onClose={() => {
+                        setEditPlace(
+                            null
+                        );
 
-                            setShowAddModal(false);
+                    }}
 
-                            setEditPlace(null);
+                />
 
-                        }}
-
-                    />
-
-                )
-            }
-
-
+            )}
 
         </section>
 

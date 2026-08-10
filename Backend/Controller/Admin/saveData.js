@@ -1,12 +1,18 @@
 const DraftPlace = require("../../Models/draftPlace");
 const Famous = require("../../Models/famous");
-const { cloudinary } = require("../../Config/cloudinary");
-const { getSocketIO } = require("../../Config/socket");
+
+const {
+    cloudinary
+} = require("../../Config/cloudinary");
+
+const {
+    getSocketIO
+} = require("../../Config/socket");
 
 
-// =========================================
+// =====================================================
 // CLOUDINARY CLEANUP
-// =========================================
+// =====================================================
 
 async function deleteUploadedImages(images) {
 
@@ -15,9 +21,11 @@ async function deleteUploadedImages(images) {
         try {
 
             if (image.filename) {
+
                 await cloudinary.uploader.destroy(
                     image.filename
                 );
+
             }
 
         } catch (error) {
@@ -34,9 +42,9 @@ async function deleteUploadedImages(images) {
 }
 
 
-// =========================================
+// =====================================================
 // SAVE DRAFT
-// =========================================
+// =====================================================
 
 async function savedDraft(req, res) {
 
@@ -56,25 +64,49 @@ async function savedDraft(req, res) {
 
         const result = await DraftPlace.create(obj);
 
-        if (result) {
+        if (!result) {
 
-            return res.status(200).json({
-                status: true,
-                message: "Draft saved"
+            await deleteUploadedImages(images);
+
+            return res.status(400).json({
+                status: false,
+                message: "Draft Not Saved"
             });
 
         }
 
-        await deleteUploadedImages(images);
+        // =================================================
+        // SOCKET
+        // =================================================
 
-        return res.status(400).json({
-            status: false,
-            message: "Draft Not Saved"
+        const io = getSocketIO();
+
+        if (io) {
+
+            io.emit(
+                "draftAdded",
+                result
+            );
+
+            console.log(
+                "Socket: draftAdded",
+                result._id
+            );
+
+        }
+
+        return res.status(200).json({
+            status: true,
+            message: "Draft saved",
+            draft: result
         });
 
     } catch (error) {
 
-        console.log(error);
+        console.log(
+            "Save Draft Error:",
+            error
+        );
 
         await deleteUploadedImages(images);
 
@@ -88,9 +120,9 @@ async function savedDraft(req, res) {
 }
 
 
-// =========================================
+// =====================================================
 // SAVE / PUBLISH PLACE
-// =========================================
+// =====================================================
 
 async function savedplace(req, res) {
 
@@ -108,59 +140,65 @@ async function savedplace(req, res) {
             photos
         };
 
+        // Remove empty state_id
         if (!obj.state_id) {
             delete obj.state_id;
         }
 
         // FormData sends strings
         if (obj.featured !== undefined) {
+
             obj.featured =
+                obj.featured === true ||
                 obj.featured === "true";
+
         }
 
         const result = await Famous.create(obj);
 
-        if (result) {
+        if (!result) {
 
-            // =====================================
-            // REALTIME PLACE ADDED
-            // =====================================
+            await deleteUploadedImages(images);
 
-            const io = getSocketIO();
-
-            if (io) {
-
-                io.emit(
-                    "placeAdded",
-                    result
-                );
-
-                console.log(
-                    "Socket: placeAdded",
-                    result._id
-                );
-
-            }
-
-
-            return res.status(200).json({
-                status: true,
-                message: "Place published successfully",
-                obj: result
+            return res.status(400).json({
+                status: false,
+                message: "Place Not Published"
             });
 
         }
 
-        await deleteUploadedImages(images);
+        // =================================================
+        // SOCKET
+        // =================================================
 
-        return res.status(400).json({
-            status: false,
-            message: "Place Not Published"
+        const io = getSocketIO();
+
+        if (io) {
+
+            io.emit(
+                "placeAdded",
+                result
+            );
+
+            console.log(
+                "Socket: placeAdded",
+                result._id
+            );
+
+        }
+
+        return res.status(201).json({
+            status: true,
+            message: "Place published successfully",
+            place: result
         });
 
     } catch (error) {
 
-        console.log(error);
+        console.log(
+            "Save Place Error:",
+            error
+        );
 
         await deleteUploadedImages(images);
 
@@ -174,9 +212,9 @@ async function savedplace(req, res) {
 }
 
 
-// =========================================
+// =====================================================
 // UPDATE PLACE
-// =========================================
+// =====================================================
 
 async function updatePlace(req, res) {
 
@@ -196,32 +234,60 @@ async function updatePlace(req, res) {
         }
 
 
-        // =====================================
-        // UPDATE BASIC DATA
-        // =====================================
+        // =================================================
+        // BASIC DATA
+        // =================================================
 
-        place.state_id = req.body.state_id;
-        place.name = req.body.name;
-        place.title = req.body.title;
-        place.description = req.body.description;
-        place.story = req.body.story;
+        if (req.body.state_id !== undefined) {
+            place.state_id = req.body.state_id;
+        }
 
-        place.featured =
-            req.body.featured === "true";
+        if (req.body.name !== undefined) {
+            place.name = req.body.name;
+        }
+
+        if (req.body.title !== undefined) {
+            place.title = req.body.title;
+        }
+
+        if (req.body.description !== undefined) {
+            place.description = req.body.description;
+        }
+
+        if (req.body.story !== undefined) {
+            place.story = req.body.story;
+        }
 
 
-        // =====================================
+        // =================================================
+        // FEATURED
+        // =================================================
+
+        if (req.body.featured !== undefined) {
+
+            place.featured =
+                req.body.featured === true ||
+                req.body.featured === "true";
+
+        }
+
+
+        // =================================================
         // ADD NEW PHOTOS
-        // =====================================
+        // =================================================
 
         if (req.files?.length) {
 
-            const newPhotos = req.files.map((file) => ({
-                url: file.path,
-                publicId: file.filename
-            }));
+            const newPhotos = req.files.map(
+                (file) => ({
+                    url: file.path,
+                    publicId: file.filename
+                })
+            );
 
-            place.photos.push(...newPhotos);
+            place.photos.push(
+                ...newPhotos
+            );
 
         }
 
@@ -229,9 +295,9 @@ async function updatePlace(req, res) {
         await place.save();
 
 
-        // =====================================
-        // REALTIME PLACE UPDATED
-        // =====================================
+        // =================================================
+        // SOCKET
+        // =================================================
 
         const io = getSocketIO();
 
@@ -239,7 +305,10 @@ async function updatePlace(req, res) {
 
             io.emit(
                 "placeUpdated",
-                place
+                {
+                    place,
+                    changeType: "updated"
+                }
             );
 
             console.log(
@@ -254,7 +323,8 @@ async function updatePlace(req, res) {
 
             status: true,
 
-            message: "Place updated successfully",
+            message:
+                "Place updated successfully",
 
             place
 
@@ -262,14 +332,14 @@ async function updatePlace(req, res) {
 
     } catch (error) {
 
-        console.log(error);
+        console.log(
+            "Update Place Error:",
+            error
+        );
 
         return res.status(500).json({
-
             status: false,
-
             message: "Server Error"
-
         });
 
     }
@@ -277,9 +347,9 @@ async function updatePlace(req, res) {
 }
 
 
-// =========================================
+// =====================================================
 // DELETE PLACE IMAGE
-// =========================================
+// =====================================================
 
 async function deletePlaceImage(req, res) {
 
@@ -288,40 +358,34 @@ async function deletePlaceImage(req, res) {
         const { id } = req.params;
         const { photoId } = req.body;
 
-
-        const place = await Famous.findById(id);
+        const place =
+            await Famous.findById(id);
 
         if (!place) {
 
             return res.status(404).json({
-
                 status: false,
-
                 message: "Place not found"
-
             });
 
         }
 
-
-        const photo = place.photos.id(photoId);
+        const photo =
+            place.photos.id(photoId);
 
         if (!photo) {
 
             return res.status(404).json({
-
                 status: false,
-
                 message: "Image not found"
-
             });
 
         }
 
 
-        // =====================================
-        // DELETE FROM CLOUDINARY
-        // =====================================
+        // =================================================
+        // CLOUDINARY
+        // =================================================
 
         if (photo.publicId) {
 
@@ -332,18 +396,18 @@ async function deletePlaceImage(req, res) {
         }
 
 
-        // =====================================
-        // DELETE FROM MONGODB
-        // =====================================
+        // =================================================
+        // MONGODB
+        // =================================================
 
         photo.deleteOne();
 
         await place.save();
 
 
-        // =====================================
-        // REALTIME PLACE UPDATED
-        // =====================================
+        // =================================================
+        // SOCKET
+        // =================================================
 
         const io = getSocketIO();
 
@@ -351,7 +415,11 @@ async function deletePlaceImage(req, res) {
 
             io.emit(
                 "placeUpdated",
-                place
+                {
+                    place,
+                    changeType: "imageDeleted",
+                    photoId
+                }
             );
 
             console.log(
@@ -366,22 +434,24 @@ async function deletePlaceImage(req, res) {
 
             status: true,
 
-            message: "Image deleted successfully",
+            message:
+                "Image deleted successfully",
 
-            photos: place.photos
+            photos:
+                place.photos
 
         });
 
     } catch (error) {
 
-        console.log(error);
+        console.log(
+            "Delete Place Image Error:",
+            error
+        );
 
         return res.status(500).json({
-
             status: false,
-
             message: "Image delete failed"
-
         });
 
     }
@@ -389,9 +459,9 @@ async function deletePlaceImage(req, res) {
 }
 
 
-// =========================================
+// =====================================================
 // DELETE PLACE
-// =========================================
+// =====================================================
 
 async function deletePlace(req, res) {
 
@@ -399,25 +469,22 @@ async function deletePlace(req, res) {
 
         const { id } = req.params;
 
-
-        const place = await Famous.findById(id);
+        const place =
+            await Famous.findById(id);
 
         if (!place) {
 
             return res.status(404).json({
-
                 status: false,
-
                 message: "Place not found"
-
             });
 
         }
 
 
-        // =====================================
-        // DELETE IMAGES FROM CLOUDINARY
-        // =====================================
+        // =================================================
+        // CLOUDINARY
+        // =================================================
 
         if (place.photos?.length) {
 
@@ -425,9 +492,20 @@ async function deletePlace(req, res) {
 
                 if (photo.publicId) {
 
-                    await cloudinary.uploader.destroy(
-                        photo.publicId
-                    );
+                    try {
+
+                        await cloudinary.uploader.destroy(
+                            photo.publicId
+                        );
+
+                    } catch (error) {
+
+                        console.log(
+                            "Cloudinary delete error:",
+                            error.message
+                        );
+
+                    }
 
                 }
 
@@ -436,16 +514,16 @@ async function deletePlace(req, res) {
         }
 
 
-        // =====================================
-        // DELETE FROM MONGODB
-        // =====================================
+        // =================================================
+        // MONGODB
+        // =================================================
 
         await Famous.findByIdAndDelete(id);
 
 
-        // =====================================
-        // REALTIME PLACE DELETED
-        // =====================================
+        // =================================================
+        // SOCKET
+        // =================================================
 
         const io = getSocketIO();
 
@@ -453,7 +531,9 @@ async function deletePlace(req, res) {
 
             io.emit(
                 "placeDeleted",
-                id
+                {
+                    _id: id
+                }
             );
 
             console.log(
@@ -468,20 +548,21 @@ async function deletePlace(req, res) {
 
             status: true,
 
-            message: "Place deleted successfully"
+            message:
+                "Place deleted successfully"
 
         });
 
     } catch (error) {
 
-        console.log(error);
+        console.log(
+            "Delete Place Error:",
+            error
+        );
 
         return res.status(500).json({
-
             status: false,
-
             message: "Server error"
-
         });
 
     }
@@ -489,26 +570,82 @@ async function deletePlace(req, res) {
 }
 
 
-// =========================================
+// =====================================================
 // TOGGLE FEATURED
-// =========================================
+// =====================================================
 
 async function toggleFeatured(req, res) {
 
     try {
 
         const { id } = req.params;
-        const { featured } = req.body;
+
+        let featured = req.body.featured;
+
+        // Normalize JSON/FormData
+        if (typeof featured === "string") {
+            featured = featured === "true";
+        }
+
+        if (typeof featured !== "boolean") {
+
+            return res.status(400).json({
+                status: false,
+                message:
+                    "Featured must be true or false"
+            });
+
+        }
 
 
-        const count = await Famous.countDocuments({
-            featured: true
-        });
+        // =================================================
+        // CURRENT PLACE
+        // =================================================
+
+        const currentPlace =
+            await Famous.findById(id);
+
+        if (!currentPlace) {
+
+            return res.status(404).json({
+                status: false,
+                message: "Place not found"
+            });
+
+        }
 
 
-        // =====================================
-        // MAXIMUM 6 FEATURED
-        // =====================================
+        // =================================================
+        // IF NO CHANGE
+        // =================================================
+
+        if (
+            currentPlace.featured === featured
+        ) {
+
+            return res.status(200).json({
+                status: true,
+                message:
+                    "Featured status already set",
+                place: currentPlace
+            });
+
+        }
+
+
+        // =================================================
+        // FEATURED COUNT
+        // =================================================
+
+        const count =
+            await Famous.countDocuments({
+                featured: true
+            });
+
+
+        // =================================================
+        // MAX 6
+        // =================================================
 
         if (
             featured === true &&
@@ -516,20 +653,17 @@ async function toggleFeatured(req, res) {
         ) {
 
             return res.status(400).json({
-
                 status: false,
-
                 message:
                     "Maximum 6 featured places allowed"
-
             });
 
         }
 
 
-        // =====================================
-        // MINIMUM 3 FEATURED
-        // =====================================
+        // =================================================
+        // MIN 3
+        // =================================================
 
         if (
             featured === false &&
@@ -537,45 +671,34 @@ async function toggleFeatured(req, res) {
         ) {
 
             return res.status(400).json({
-
                 status: false,
-
                 message:
                     "At least 3 featured places required"
-
             });
 
         }
 
+
+        // =================================================
+        // UPDATE
+        // =================================================
 
         const place =
             await Famous.findByIdAndUpdate(
-
                 id,
-
-                { featured },
-
-                { new: true }
-
+                {
+                    featured
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
             );
 
 
-        if (!place) {
-
-            return res.status(404).json({
-
-                status: false,
-
-                message: "Place not found"
-
-            });
-
-        }
-
-
-        // =====================================
-        // REALTIME PLACE UPDATED
-        // =====================================
+        // =================================================
+        // SOCKET
+        // =================================================
 
         const io = getSocketIO();
 
@@ -583,20 +706,27 @@ async function toggleFeatured(req, res) {
 
             io.emit(
                 "placeUpdated",
-                place
+                {
+                    place,
+                    changeType: "featured"
+                }
             );
 
             console.log(
                 "Socket: placeUpdated (featured)",
-                place._id
+                place._id,
+                featured
             );
 
         }
 
 
-        return res.json({
+        return res.status(200).json({
 
             status: true,
+
+            message:
+                "Featured status updated",
 
             place
 
@@ -604,14 +734,14 @@ async function toggleFeatured(req, res) {
 
     } catch (error) {
 
-        console.log(error);
+        console.log(
+            "Toggle Featured Error:",
+            error
+        );
 
         return res.status(500).json({
-
             status: false,
-
             message: "Server Error"
-
         });
 
     }

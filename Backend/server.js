@@ -15,16 +15,32 @@ const {
     UserOnly
 } = require("./Midleware/Auth");
 
+const AuthRoutes = require("./Routes/Auth/Auth");
+const AdminRoutes = require("./Routes/Admin/admin");
+const DashboardRoutes = require("./Routes/Dashboard/Dashboard");
+
 const app = express();
 
 dotenv.config();
 
 ConnectDB();
 
-app.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true
-}));
+
+// =========================================
+// CORS
+// =========================================
+
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true
+    })
+);
+
+
+// =========================================
+// MIDDLEWARE
+// =========================================
 
 app.use(cookieParser());
 
@@ -37,22 +53,27 @@ app.use(express.json());
 
 app.use(
     "/",
-    require("./Routes/Auth/Auth")
+    AuthRoutes
 );
 
 app.use(
     "/admin",
     UserLogin,
     AdminOnly,
-    require("./Routes/Admin/admin")
+    AdminRoutes
 );
 
 app.use(
     "/dashboard",
     UserLogin,
     UserOnly,
-    require("./Routes/Dashboard/Dashboard")
+    DashboardRoutes
 );
+
+
+// =========================================
+// CURRENT USER
+// =========================================
 
 app.get(
     "/me",
@@ -75,7 +96,10 @@ const io = new Server(server, {
 });
 
 
-// Make Socket.IO available to controllers
+// =========================================
+// MAKE SOCKET.IO AVAILABLE
+// =========================================
+
 setSocketIO(io);
 
 
@@ -85,20 +109,30 @@ setSocketIO(io);
 
 io.on("connection", (socket) => {
 
-    console.log("User connected:", socket.id);
+    console.log(
+        "User connected:",
+        socket.id
+    );
 
-    socket.emit("welcome", {
-        message: "IndiaScape real-time connection working!"
-    });
+    socket.emit(
+        "welcome",
+        {
+            message:
+                "IndiaScape real-time connection working!"
+        }
+    );
 
-    socket.on("disconnect", () => {
+    socket.on(
+        "disconnect",
+        () => {
 
-        console.log(
-            "User disconnected:",
-            socket.id
-        );
+            console.log(
+                "User disconnected:",
+                socket.id
+            );
 
-    });
+        }
+    );
 
 });
 
@@ -107,8 +141,13 @@ io.on("connection", (socket) => {
 // SERVER START
 // =========================================
 
-server.listen(3000, () => {
+server.listen(
+    3000,
+    () => {
 
-    console.log("Backend Start");
+        console.log(
+            "Backend Start"
+        );
 
-});
+    }
+);

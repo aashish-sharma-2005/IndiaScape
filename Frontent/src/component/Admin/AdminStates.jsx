@@ -12,43 +12,83 @@ import {
 } from "lucide-react";
 import "./adminState.css";
 
+
 function AdminStates() {
 
     const navigate = useNavigate();
-    const { states, setAdminData } = useOutletContext();
+
+    const {
+        states,
+        setAdminData
+    } = useOutletContext();
+
 
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("all");
 
-    // Edit state
+
+    // =========================================
+    // EDIT STATE
+    // =========================================
+
     const [editingId, setEditingId] = useState(null);
     const [editName, setEditName] = useState("");
     const [savingId, setSavingId] = useState(null);
 
+
+    // =========================================
+    // COUNTS
+    // =========================================
+
     const visibleCount = states.filter(
-        state => state.visible
+        (state) => state.visible
     ).length;
 
-    const hiddenCount = states.length - visibleCount;
 
-    const filteredStates = states.filter(state => {
-
-        const matchSearch = state.name
-            ?.toLowerCase()
-            .includes(search.toLowerCase());
-
-        const matchFilter =
-            filter === "all" ||
-            (filter === "visible" && state.visible) ||
-            (filter === "hidden" && !state.visible);
-
-        return matchSearch && matchFilter;
-    });
+    const hiddenCount =
+        states.length - visibleCount;
 
 
-    // =========================
+    // =========================================
+    // FILTER STATES
+    // =========================================
+
+    const filteredStates =
+        states.filter((state) => {
+
+            const matchSearch =
+                state.name
+                    ?.toLowerCase()
+                    .includes(
+                        search.toLowerCase()
+                    );
+
+
+            const matchFilter =
+                filter === "all" ||
+
+                (
+                    filter === "visible" &&
+                    state.visible
+                ) ||
+
+                (
+                    filter === "hidden" &&
+                    !state.visible
+                );
+
+
+            return (
+                matchSearch &&
+                matchFilter
+            );
+
+        });
+
+
+    // =========================================
     // TOGGLE VISIBILITY
-    // =========================
+    // =========================================
 
     const toggleVisibility = async (state) => {
 
@@ -58,109 +98,173 @@ function AdminStates() {
                 `http://localhost:3000/admin/state/${state._id}/visibility`,
                 {
                     method: "PUT",
+
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type":
+                            "application/json"
                     },
+
                     credentials: "include",
+
                     body: JSON.stringify({
-                        visible: !state.visible
+                        visible:
+                            !state.visible
                     })
                 }
             );
 
-            const result = await response.json();
+
+            const result =
+                await response.json();
+
 
             if (result.status) {
 
-                setAdminData(prev => ({
+                setAdminData((prev) => ({
+
                     ...prev,
-                    states: prev.states.map(item =>
-                        item._id === state._id
-                            ? {
-                                ...item,
-                                visible: !item.visible
-                            }
-                            : item
-                    )
+
+                    states:
+                        prev.states.map(
+                            (item) =>
+                                item._id === state._id
+                                    ? {
+                                        ...item,
+                                        visible:
+                                            !item.visible
+                                    }
+                                    : item
+                        )
+
                 }));
+
+            } else {
+
+                alert(
+                    result.message ||
+                    "Failed to update visibility"
+                );
+
             }
 
         } catch (error) {
 
-            console.log(error);
+            console.log(
+                "Visibility error:",
+                error
+            );
+
+            alert(
+                "Something went wrong"
+            );
 
         }
+
     };
 
 
-    // =========================
+    // =========================================
     // START EDIT
-    // =========================
+    // =========================================
 
     const startEdit = (state) => {
 
-        setEditingId(state._id);
-        setEditName(state.name);
+        setEditingId(
+            state._id
+        );
+
+        setEditName(
+            state.name
+        );
 
     };
 
 
-    // =========================
+    // =========================================
     // CANCEL EDIT
-    // =========================
+    // =========================================
 
     const cancelEdit = () => {
 
         setEditingId(null);
+
         setEditName("");
 
     };
 
 
-    // =========================
+    // =========================================
     // SAVE STATE NAME
-    // =========================
+    // =========================================
 
     const saveStateName = async (state) => {
 
-        const trimmedName = editName.trim();
+        const trimmedName =
+            editName.trim();
+
 
         if (!trimmedName) {
 
-            alert("State name is required.");
+            alert(
+                "State name is required."
+            );
+
             return;
 
         }
 
-        // Nothing changed
-        if (trimmedName === state.name) {
+
+        // =================================
+        // NOTHING CHANGED
+        // =================================
+
+        if (
+            trimmedName === state.name
+        ) {
 
             cancelEdit();
+
             return;
 
         }
+
 
         try {
 
-            setSavingId(state._id);
+            setSavingId(
+                state._id
+            );
+
 
             const response = await fetch(
                 `http://localhost:3000/admin/state/${state._id}`,
                 {
                     method: "PUT",
+
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type":
+                            "application/json"
                     },
+
                     credentials: "include",
+
                     body: JSON.stringify({
-                        name: trimmedName
+                        name:
+                            trimmedName
                     })
+
                 }
             );
 
-            const result = await response.json();
 
-            if (!response.ok || !result.status) {
+            const result =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !result.status
+            ) {
 
                 alert(
                     result.message ||
@@ -168,28 +272,44 @@ function AdminStates() {
                 );
 
                 return;
+
             }
 
 
-            // Update frontend state
-            setAdminData(prev => ({
+            // =================================
+            // UPDATE ADMIN DATA
+            // =================================
+
+            setAdminData((prev) => ({
+
                 ...prev,
-                states: prev.states.map(item =>
-                    item._id === state._id
-                        ? {
-                            ...item,
-                            name: result.state?.name || trimmedName
-                        }
-                        : item
-                )
+
+                states:
+                    prev.states.map(
+                        (item) =>
+                            item._id === state._id
+                                ? {
+                                    ...item,
+                                    name:
+                                        result.state?.name ||
+                                        trimmedName
+                                }
+                                : item
+                    )
+
             }));
 
+
             setEditingId(null);
+
             setEditName("");
 
         } catch (error) {
 
-            console.log(error);
+            console.log(
+                "Update state error:",
+                error
+            );
 
             alert(
                 "Something went wrong while updating the state."
@@ -200,21 +320,32 @@ function AdminStates() {
             setSavingId(null);
 
         }
+
     };
 
 
-    // =========================
+    // =========================================
     // KEYBOARD HANDLER
-    // =========================
+    // =========================================
 
-    const handleKeyDown = (e, state) => {
+    const handleKeyDown = (
+        e,
+        state
+    ) => {
 
         if (e.key === "Enter") {
-            saveStateName(state);
+
+            saveStateName(
+                state
+            );
+
         }
 
+
         if (e.key === "Escape") {
+
             cancelEdit();
+
         }
 
     };
@@ -224,9 +355,10 @@ function AdminStates() {
 
         <section className="states-page">
 
-            {/* =========================
+
+            {/* =================================
                 TOP
-            ========================= */}
+            ================================= */}
 
             <div className="states-top">
 
@@ -236,7 +368,9 @@ function AdminStates() {
                         INDIA SCAPE • ADMIN
                     </span>
 
-                    <h1>States</h1>
+                    <h1>
+                        States
+                    </h1>
 
                     <p>
                         Control which states are visible on your website.
@@ -247,24 +381,31 @@ function AdminStates() {
 
                 <button
                     className="dashboard-btn"
-                    onClick={() => navigate("/admin")}
+                    onClick={() =>
+                        navigate("/admin")
+                    }
                 >
+
                     <ArrowLeft size={17} />
+
                     Dashboard
+
                 </button>
 
             </div>
 
 
-            {/* =========================
+            {/* =================================
                 STATS
-            ========================= */}
+            ================================= */}
 
             <div className="state-stats">
 
                 <div className="state-stat">
 
-                    <span>Total States</span>
+                    <span>
+                        Total States
+                    </span>
 
                     <strong>
                         {states.length}
@@ -275,7 +416,9 @@ function AdminStates() {
 
                 <div className="state-stat">
 
-                    <span>Visible</span>
+                    <span>
+                        Visible
+                    </span>
 
                     <strong>
                         {visibleCount}
@@ -290,7 +433,9 @@ function AdminStates() {
 
                 <div className="state-stat">
 
-                    <span>Hidden</span>
+                    <span>
+                        Hidden
+                    </span>
 
                     <strong>
                         {hiddenCount}
@@ -305,9 +450,9 @@ function AdminStates() {
             </div>
 
 
-            {/* =========================
+            {/* =================================
                 TOOLBAR
-            ========================= */}
+            ================================= */}
 
             <div className="states-toolbar">
 
@@ -317,9 +462,13 @@ function AdminStates() {
 
                     <input
                         value={search}
-                        onChange={e =>
-                            setSearch(e.target.value)
+
+                        onChange={(e) =>
+                            setSearch(
+                                e.target.value
+                            )
                         }
+
                         placeholder="Search states..."
                     />
 
@@ -334,11 +483,15 @@ function AdminStates() {
                                 ? "active"
                                 : ""
                         }
+
                         onClick={() =>
                             setFilter("all")
                         }
                     >
-                        All <b>{states.length}</b>
+                        All{" "}
+                        <b>
+                            {states.length}
+                        </b>
                     </button>
 
 
@@ -348,11 +501,15 @@ function AdminStates() {
                                 ? "active"
                                 : ""
                         }
+
                         onClick={() =>
                             setFilter("visible")
                         }
                     >
-                        Visible <b>{visibleCount}</b>
+                        Visible{" "}
+                        <b>
+                            {visibleCount}
+                        </b>
                     </button>
 
 
@@ -362,11 +519,15 @@ function AdminStates() {
                                 ? "active"
                                 : ""
                         }
+
                         onClick={() =>
                             setFilter("hidden")
                         }
                     >
-                        Hidden <b>{hiddenCount}</b>
+                        Hidden{" "}
+                        <b>
+                            {hiddenCount}
+                        </b>
                     </button>
 
                 </div>
@@ -374,9 +535,9 @@ function AdminStates() {
             </div>
 
 
-            {/* =========================
+            {/* =================================
                 HEADING
-            ========================= */}
+            ================================= */}
 
             <div className="states-heading">
 
@@ -395,193 +556,237 @@ function AdminStates() {
             </div>
 
 
-            {/* =========================
+            {/* =================================
                 STATES
-            ========================= */}
+            ================================= */}
 
             <div className="states-grid">
 
-                {filteredStates.map((state, index) => (
+                {filteredStates.map(
+                    (state, index) => (
 
-                    <div
-                        className="state-card"
-                        key={state._id}
-                    >
+                        <div
+                            className="state-card"
+                            key={state._id}
+                        >
 
-                        <div className="state-number">
-                            {String(index + 1).padStart(2, "0")}
-                        </div>
-
-
-                        <div className="state-icon">
-                            🇮🇳
-                        </div>
-
-
-                        <div className="state-details">
-
-                            {editingId === state._id ? (
-
-                                <input
-                                    className="state-name-input"
-                                    value={editName}
-                                    autoFocus
-                                    onChange={e =>
-                                        setEditName(
-                                            e.target.value
-                                        )
-                                    }
-                                    onKeyDown={e =>
-                                        handleKeyDown(
-                                            e,
-                                            state
-                                        )
-                                    }
-                                />
-
-                            ) : (
-
-                                <h3>
-                                    {state.name}
-                                </h3>
-
-                            )}
-
-
-                            <span
-                                className={
-                                    state.visible
-                                        ? "status live"
-                                        : "status hidden"
+                            <div className="state-number">
+                                {
+                                    String(
+                                        index + 1
+                                    ).padStart(
+                                        2,
+                                        "0"
+                                    )
                                 }
-                            >
-                                {state.visible
-                                    ? "● Visible"
-                                    : "○ Hidden"}
-                            </span>
-
-                        </div>
+                            </div>
 
 
-                        {/* =========================
-                            ACTIONS
-                        ========================= */}
+                            <div className="state-icon">
+                                🇮🇳
+                            </div>
 
-                        <div className="state-actions">
 
-                            {editingId === state._id ? (
+                            <div className="state-details">
 
-                                <>
+                                {editingId === state._id ? (
 
-                                    {/* SAVE */}
+                                    <input
+                                        className="state-name-input"
 
-                                    <button
-                                        title="Save"
-                                        disabled={
-                                            savingId === state._id
+                                        value={editName}
+
+                                        autoFocus
+
+                                        onChange={(e) =>
+                                            setEditName(
+                                                e.target.value
+                                            )
                                         }
-                                        onClick={() =>
-                                            saveStateName(state)
+
+                                        onKeyDown={(e) =>
+                                            handleKeyDown(
+                                                e,
+                                                state
+                                            )
                                         }
-                                    >
+                                    />
 
-                                        {savingId === state._id ? (
+                                ) : (
 
-                                            <LoaderCircle
+                                    <h3>
+                                        {state.name}
+                                    </h3>
+
+                                )}
+
+
+                                <span
+                                    className={
+                                        state.visible
+                                            ? "status live"
+                                            : "status hidden"
+                                    }
+                                >
+                                    {state.visible
+                                        ? "● Visible"
+                                        : "○ Hidden"}
+                                </span>
+
+                            </div>
+
+
+                            {/* =================================
+                                ACTIONS
+                            ================================= */}
+
+                            <div className="state-actions">
+
+                                {editingId === state._id ? (
+
+                                    <>
+
+                                        {/* SAVE */}
+
+                                        <button
+                                            title="Save"
+
+                                            disabled={
+                                                savingId ===
+                                                state._id
+                                            }
+
+                                            onClick={() =>
+                                                saveStateName(
+                                                    state
+                                                )
+                                            }
+                                        >
+
+                                            {savingId === state._id ? (
+
+                                                <LoaderCircle
+                                                    size={19}
+                                                    className="state-saving-spinner"
+                                                />
+
+                                            ) : (
+
+                                                <Check
+                                                    size={19}
+                                                />
+
+                                            )}
+
+                                        </button>
+
+
+                                        {/* CANCEL */}
+
+                                        <button
+                                            title="Cancel"
+
+                                            disabled={
+                                                savingId ===
+                                                state._id
+                                            }
+
+                                            onClick={
+                                                cancelEdit
+                                            }
+                                        >
+
+                                            <X size={19} />
+
+                                        </button>
+
+                                    </>
+
+                                ) : (
+
+                                    <>
+
+                                        {/* VIEW PLACES */}
+
+                                        <button
+                                            title="View Places"
+
+                                            onClick={() =>
+                                                navigate(
+                                                    `/admin/states/${state._id}`
+                                                )
+                                            }
+                                        >
+
+                                            <ChevronRight
                                                 size={19}
-                                                className="state-saving-spinner"
                                             />
 
-                                        ) : (
-
-                                            <Check size={19} />
-
-                                        )}
-
-                                    </button>
+                                        </button>
 
 
-                                    {/* CANCEL */}
+                                        {/* EDIT */}
 
-                                    <button
-                                        title="Cancel"
-                                        disabled={
-                                            savingId === state._id
-                                        }
-                                        onClick={cancelEdit}
-                                    >
-                                        <X size={19} />
-                                    </button>
+                                        <button
+                                            title="Edit"
 
-                                </>
-
-                            ) : (
-
-                                <>
-
-                                    {/* VIEW PLACES */}
-
-                                    <button
-                                        title="View Places"
-                                        onClick={() =>
-                                            navigate(
-                                                `/admin/states/${state._id}`
-                                            )
-                                        }
-                                    >
-                                        <ChevronRight size={19} />
-                                    </button>
+                                            onClick={() =>
+                                                startEdit(
+                                                    state
+                                                )
+                                            }
+                                        >
+                                            ✎
+                                        </button>
 
 
-                                    {/* EDIT */}
+                                        {/* VISIBILITY */}
 
-                                    <button
-                                        title="Edit"
-                                        onClick={() =>
-                                            startEdit(state)
-                                        }
-                                    >
-                                        ✎
-                                    </button>
+                                        <button
+                                            title={
+                                                state.visible
+                                                    ? "Hide State"
+                                                    : "Show State"
+                                            }
 
+                                            onClick={() =>
+                                                toggleVisibility(
+                                                    state
+                                                )
+                                            }
+                                        >
 
-                                    {/* VISIBILITY */}
+                                            {state.visible
+                                                ? (
+                                                    <Eye
+                                                        size={19}
+                                                    />
+                                                )
+                                                : (
+                                                    <EyeOff
+                                                        size={19}
+                                                    />
+                                                )}
 
-                                    <button
-                                        title={
-                                            state.visible
-                                                ? "Hide State"
-                                                : "Show State"
-                                        }
-                                        onClick={() =>
-                                            toggleVisibility(state)
-                                        }
-                                    >
-                                        {state.visible
-                                            ? (
-                                                <Eye size={19} />
-                                            )
-                                            : (
-                                                <EyeOff size={19} />
-                                            )}
-                                    </button>
+                                        </button>
 
-                                </>
+                                    </>
 
-                            )}
+                                )}
+
+                            </div>
 
                         </div>
 
-                    </div>
-
-                ))}
+                    )
+                )}
 
             </div>
 
 
-            {/* =========================
+            {/* =================================
                 EMPTY
-            ========================= */}
+            ================================= */}
 
             {filteredStates.length === 0 && (
 
@@ -604,6 +809,8 @@ function AdminStates() {
         </section>
 
     );
+
 }
+
 
 export default AdminStates;

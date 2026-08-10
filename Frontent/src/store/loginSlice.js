@@ -1,43 +1,70 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+    createSlice,
+    createAsyncThunk
+} from "@reduxjs/toolkit";
 
 
 // ========================================
-// VISIT STATE
+// LOGOUT USER
 // ========================================
+
 export const logoutUser = createAsyncThunk(
     "login/logoutUser",
 
     async (_, { rejectWithValue }) => {
+
         try {
+
             const response = await fetch(
                 "http://localhost:3000/logout",
                 {
-                    method: "post",
+                    method: "POST",
                     credentials: "include",
                 }
             );
 
-            const result = await response.json();
+            const result =
+                await response.json();
 
-            if (!response.ok || !result.status) {
+            if (
+                !response.ok ||
+                !result.status
+            ) {
+
                 return rejectWithValue(
-                    result.message || "Logout failed"
+                    result.message ||
+                    "Logout failed"
                 );
+
             }
 
             return true;
 
         } catch (error) {
+
             console.log(error);
 
-            return rejectWithValue("Server Error");
+            return rejectWithValue(
+                "Server Error"
+            );
+
         }
+
     }
 );
+
+
+// ========================================
+// VISIT STATE
+// ========================================
+
 export const visitState = createAsyncThunk(
     "login/visitState",
 
-    async (stateId, { rejectWithValue }) => {
+    async (
+        stateId,
+        { rejectWithValue }
+    ) => {
 
         try {
 
@@ -46,22 +73,34 @@ export const visitState = createAsyncThunk(
                 {
                     method: "POST",
                     credentials: "include",
+
                     headers: {
-                        "Content-Type": "application/json",
+                        "Content-Type":
+                            "application/json",
                     },
-                    body: JSON.stringify({ stateId }),
+
+                    body: JSON.stringify({
+                        stateId
+                    }),
                 }
             );
 
-            const result = await response.json();
+            const result =
+                await response.json();
 
-            if (!response.ok || !result.success) {
+
+            if (
+                !response.ok ||
+                !result.success
+            ) {
 
                 return rejectWithValue(
-                    result.message || "Failed to visit state"
+                    result.message ||
+                    "Failed to visit state"
                 );
 
             }
+
 
             return result.visitedStates;
 
@@ -69,7 +108,9 @@ export const visitState = createAsyncThunk(
 
             console.log(error);
 
-            return rejectWithValue("Server Error");
+            return rejectWithValue(
+                "Server Error"
+            );
 
         }
 
@@ -84,7 +125,10 @@ export const visitState = createAsyncThunk(
 export const fetchUser = createAsyncThunk(
     "login/fetchUser",
 
-    async (_, { rejectWithValue }) => {
+    async (
+        _,
+        { rejectWithValue }
+    ) => {
 
         try {
 
@@ -107,17 +151,24 @@ export const fetchUser = createAsyncThunk(
             }
 
 
-            const result = await response.json();
+            const result =
+                await response.json();
 
 
-            if (!response.ok || !result.status) {
+            if (
+                !response.ok ||
+                !result.status
+            ) {
 
                 return rejectWithValue({
+
                     message:
                         result.message ||
                         "Failed to fetch user",
 
-                    status: response.status,
+                    status:
+                        response.status,
+
                 });
 
             }
@@ -147,25 +198,65 @@ const loginSlice = createSlice({
 
     name: "login",
 
+
     initialState: {
+
         isLogin: false,
+
         user: null,
+
     },
 
 
     reducers: {
 
-        loginSuccess: (state, action) => {
+
+        // ========================================
+        // LOGIN SUCCESS
+        // ========================================
+
+        loginSuccess: (
+            state,
+            action
+        ) => {
 
             state.isLogin = true;
-            state.user = action.payload;
+
+            state.user =
+                action.payload;
 
         },
 
 
+        // ========================================
+        // UPDATE USER
+        // ========================================
+
+        updateUser: (
+            state,
+            action
+        ) => {
+
+            if (state.user) {
+
+                state.user = {
+                    ...state.user,
+                    ...action.payload,
+                };
+
+            }
+
+        },
+
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+
         logout: (state) => {
 
             state.isLogin = false;
+
             state.user = null;
 
         },
@@ -173,37 +264,90 @@ const loginSlice = createSlice({
     },
 
 
+    // ========================================
+    // ASYNC ACTIONS
+    // ========================================
+
     extraReducers: (builder) => {
 
-    builder
+        builder
 
-        .addCase(fetchUser.fulfilled, (state, action) => {
-            state.isLogin = true;
-            state.user = action.payload;
-        })
 
-        .addCase(fetchUser.rejected, (state) => {
-            state.isLogin = false;
-            state.user = null;
-        })
+            // ========================================
+            // FETCH USER SUCCESS
+            // ========================================
 
-        .addCase(visitState.fulfilled, (state, action) => {
-            if (state.user) {
-                state.user.visitedStates = action.payload;
-            }
-        })
+            .addCase(
+                fetchUser.fulfilled,
+                (state, action) => {
 
-        .addCase(logoutUser.fulfilled, (state) => {
-            state.isLogin = false;
-            state.user = null;
-        });
-}
+                    state.isLogin = true;
+
+                    state.user =
+                        action.payload;
+
+                }
+            )
+
+
+            // ========================================
+            // FETCH USER FAILED
+            // ========================================
+
+            .addCase(
+                fetchUser.rejected,
+                (state) => {
+
+                    state.isLogin = false;
+
+                    state.user = null;
+
+                }
+            )
+
+
+            // ========================================
+            // VISIT STATE
+            // ========================================
+
+            .addCase(
+                visitState.fulfilled,
+                (state, action) => {
+
+                    if (state.user) {
+
+                        state.user.visitedStates =
+                            action.payload;
+
+                    }
+
+                }
+            )
+
+
+            // ========================================
+            // LOGOUT SUCCESS
+            // ========================================
+
+            .addCase(
+                logoutUser.fulfilled,
+                (state) => {
+
+                    state.isLogin = false;
+
+                    state.user = null;
+
+                }
+            );
+
+    },
 
 });
 
 
 export const {
     loginSuccess,
+    updateUser,
     logout,
 } = loginSlice.actions;
 

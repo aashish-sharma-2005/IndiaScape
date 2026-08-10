@@ -1,0 +1,656 @@
+/* =====================================================
+   INDIASCAPE — FAVORITES PAGE
+===================================================== */
+
+.favorite-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            circle at 10% 20%,
+            rgba(192, 133, 57, 0.08),
+            transparent 28%
+        ),
+        #f7f2e9;
+
+    color: #24180f;
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.favorite-hero {
+    min-height: 360px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(30, 18, 10, 0.82),
+            rgba(30, 18, 10, 0.35)
+        ),
+        url("/india-bg.png");
+
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    align-items: center;
+}
+
+
+.favorite-hero-overlay {
+    width: 100%;
+}
+
+
+.favorite-hero-content {
+    max-width: 1200px;
+    width: 90%;
+    margin: auto;
+
+    color: white;
+}
+
+
+.favorite-eyebrow,
+.favorite-small-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #d39b52;
+}
+
+
+.favorite-hero h1 {
+    margin: 12px 0 10px;
+
+    font-size: clamp(
+        2.8rem,
+        6vw,
+        5rem
+    );
+
+    font-weight: 700;
+    line-height: 1;
+}
+
+
+.favorite-hero p {
+    max-width: 550px;
+
+    margin: 0;
+
+    font-size: 1.05rem;
+    line-height: 1.7;
+
+    color: rgba(255, 255, 255, 0.82);
+}
+
+
+/* =====================================================
+   CONTAINER
+===================================================== */
+
+.favorite-container {
+    width: min(1200px, 90%);
+    margin: auto;
+
+    padding: 70px 0 100px;
+}
+
+
+/* =====================================================
+   SECTION HEADING
+===================================================== */
+
+.favorite-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    margin-bottom: 35px;
+}
+
+
+.favorite-section-heading h2 {
+    margin: 7px 0 0;
+
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+
+.favorite-count {
+    padding: 8px 16px;
+
+    border: 1px solid rgba(36, 24, 15, 0.12);
+    border-radius: 30px;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    background: rgba(255, 255, 255, 0.55);
+}
+
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.favorite-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 28px;
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.favorite-card {
+    overflow: hidden;
+
+    background: #fffdf9;
+
+    border: 1px solid rgba(36, 24, 15, 0.08);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 10px 30px rgba(36, 24, 15, 0.07);
+
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+.favorite-card:hover {
+    transform: translateY(-7px);
+
+    box-shadow:
+        0 20px 45px rgba(36, 24, 15, 0.14);
+}
+
+
+/* =====================================================
+   IMAGE
+===================================================== */
+
+.favorite-image-wrapper {
+    height: 245px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    cursor: pointer;
+}
+
+
+.favorite-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.5s ease;
+}
+
+
+.favorite-card:hover .favorite-image {
+    transform: scale(1.06);
+}
+
+
+.favorite-image-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.12),
+            transparent 45%,
+            rgba(0, 0, 0, 0.55)
+        );
+
+    pointer-events: none;
+}
+
+
+.favorite-no-image {
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ded5c8;
+
+    color: #75695d;
+
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   HEART
+===================================================== */
+
+.favorite-heart-btn {
+    position: absolute;
+
+    top: 15px;
+    right: 15px;
+
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.94);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.15rem;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.15);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.favorite-heart-btn:hover {
+    transform: scale(1.1);
+
+    background: white;
+}
+
+
+.favorite-heart-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+.favorite-state {
+    position: absolute;
+
+    bottom: 15px;
+    left: 15px;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.92);
+
+    color: #24180f;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* =====================================================
+   CARD CONTENT
+===================================================== */
+
+.favorite-card-content {
+    padding: 22px;
+}
+
+
+.favorite-card-content h3 {
+    margin: 0;
+
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+
+.favorite-card-title {
+    margin: 7px 0 0;
+
+    color: #a06b32;
+
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+
+.favorite-description {
+    display: -webkit-box;
+
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+
+    margin: 13px 0 20px;
+
+    color: #71665c;
+
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   VIEW BUTTON
+===================================================== */
+
+.favorite-view-btn {
+    width: 100%;
+
+    border: none;
+
+    padding: 12px 15px;
+
+    border-radius: 10px;
+
+    background: #24180f;
+
+    color: white;
+
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        transform 0.2s ease;
+}
+
+
+.favorite-view-btn:hover {
+    background: #3c291b;
+
+    transform: translateY(-1px);
+}
+
+
+.favorite-view-btn span {
+    font-size: 1.2rem;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+.favorite-view-btn:hover span {
+    transform: translateX(4px);
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.favorite-empty {
+    min-height: 430px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 60px 20px;
+}
+
+
+.favorite-empty-icon {
+    width: 90px;
+    height: 90px;
+
+    margin-bottom: 22px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(192, 133, 57, 0.12);
+
+    color: #a06b32;
+
+    font-size: 3rem;
+}
+
+
+.favorite-empty h2 {
+    margin: 0 0 10px;
+
+    font-size: 2rem;
+}
+
+
+.favorite-empty p {
+    max-width: 470px;
+
+    margin: 0 0 25px;
+
+    color: #75695d;
+
+    line-height: 1.7;
+}
+
+
+/* =====================================================
+   PRIMARY BUTTON
+===================================================== */
+
+.favorite-primary-btn {
+    border: none;
+
+    padding: 13px 24px;
+
+    border-radius: 10px;
+
+    background: #24180f;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.favorite-primary-btn:hover {
+    background: #3c291b;
+
+    transform: translateY(-2px);
+}
+
+
+/* =====================================================
+   SKELETON
+===================================================== */
+
+.favorite-heading-skeleton {
+    width: 260px;
+    height: 38px;
+
+    margin-bottom: 40px;
+
+    border-radius: 8px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #e8dfd3 25%,
+            #f4eee7 50%,
+            #e8dfd3 75%
+        );
+
+    background-size: 200% 100%;
+
+    animation: favoriteSkeleton 1.4s infinite;
+}
+
+
+.favorite-skeleton-card {
+    overflow: hidden;
+
+    background: #fffdf9;
+
+    border-radius: 18px;
+}
+
+
+.favorite-skeleton-image {
+    height: 245px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #e8dfd3 25%,
+            #f4eee7 50%,
+            #e8dfd3 75%
+        );
+
+    background-size: 200% 100%;
+
+    animation: favoriteSkeleton 1.4s infinite;
+}
+
+
+.favorite-skeleton-content {
+    padding: 22px;
+}
+
+
+.favorite-skeleton-title,
+.favorite-skeleton-text {
+    height: 18px;
+
+    margin-bottom: 13px;
+
+    border-radius: 5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #e8dfd3 25%,
+            #f4eee7 50%,
+            #e8dfd3 75%
+        );
+
+    background-size: 200% 100%;
+
+    animation: favoriteSkeleton 1.4s infinite;
+}
+
+
+.favorite-skeleton-title {
+    width: 70%;
+    height: 24px;
+}
+
+
+.favorite-skeleton-text {
+    width: 100%;
+}
+
+
+.favorite-skeleton-text.short {
+    width: 55%;
+}
+
+
+@keyframes favoriteSkeleton {
+
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 992px) {
+
+    .favorite-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .favorite-hero {
+        min-height: 300px;
+    }
+
+
+    .favorite-container {
+        width: 92%;
+
+        padding-top: 45px;
+    }
+
+
+    .favorite-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+
+    .favorite-grid {
+        grid-template-columns: 1fr;
+
+        gap: 22px;
+    }
+
+
+    .favorite-image-wrapper {
+        height: 230px;
+    }
+
+}
