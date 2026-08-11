@@ -88,7 +88,6 @@ export const visitState = createAsyncThunk(
             const result =
                 await response.json();
 
-
             if (
                 !response.ok ||
                 !result.success
@@ -100,7 +99,6 @@ export const visitState = createAsyncThunk(
                 );
 
             }
-
 
             return result.visitedStates;
 
@@ -140,7 +138,6 @@ export const fetchUser = createAsyncThunk(
                 }
             );
 
-
             if (response.status === 401) {
 
                 return rejectWithValue({
@@ -150,10 +147,8 @@ export const fetchUser = createAsyncThunk(
 
             }
 
-
             const result =
                 await response.json();
-
 
             if (
                 !response.ok ||
@@ -161,18 +156,15 @@ export const fetchUser = createAsyncThunk(
             ) {
 
                 return rejectWithValue({
-
                     message:
                         result.message ||
                         "Failed to fetch user",
 
                     status:
                         response.status,
-
                 });
 
             }
-
 
             return result.user;
 
@@ -198,18 +190,21 @@ const loginSlice = createSlice({
 
     name: "login",
 
-
     initialState: {
 
         isLogin: false,
 
         user: null,
 
+        // =================================
+        // AUTH REQUEST TRACKING
+        // =================================
+
+        fetchUserRequestId: null,
+
     },
 
-
     reducers: {
-
 
         // ========================================
         // LOGIN SUCCESS
@@ -224,6 +219,9 @@ const loginSlice = createSlice({
 
             state.user =
                 action.payload;
+
+            state.fetchUserRequestId =
+                null;
 
         },
 
@@ -259,6 +257,9 @@ const loginSlice = createSlice({
 
             state.user = null;
 
+            state.fetchUserRequestId =
+                null;
+
         },
 
     },
@@ -274,6 +275,29 @@ const loginSlice = createSlice({
 
 
             // ========================================
+            // FETCH USER STARTED
+            // ========================================
+
+            .addCase(
+                fetchUser.pending,
+                (state, action) => {
+
+                    /*
+                     * Save the ID of the latest
+                     * fetchUser request.
+                     *
+                     * If an older request finishes
+                     * later, we will ignore it.
+                     */
+
+                    state.fetchUserRequestId =
+                        action.meta.requestId;
+
+                }
+            )
+
+
+            // ========================================
             // FETCH USER SUCCESS
             // ========================================
 
@@ -281,10 +305,26 @@ const loginSlice = createSlice({
                 fetchUser.fulfilled,
                 (state, action) => {
 
+                    /*
+                     * Only the latest fetchUser
+                     * request can update auth state.
+                     */
+
+                    if (
+                        state.fetchUserRequestId !==
+                        action.meta.requestId
+                    ) {
+
+                        return;
+                    }
+
                     state.isLogin = true;
 
                     state.user =
                         action.payload;
+
+                    state.fetchUserRequestId =
+                        null;
 
                 }
             )
@@ -296,7 +336,43 @@ const loginSlice = createSlice({
 
             .addCase(
                 fetchUser.rejected,
-                (state) => {
+                (state, action) => {
+
+                    /*
+                     * VERY IMPORTANT
+                     *
+                     * If this is an old /me request,
+                     * ignore its failure.
+                     *
+                     * Example:
+                     *
+                     * App.jsx
+                     *    fetchUser #1
+                     *
+                     * Login.jsx
+                     *    fetchUser #2
+                     *
+                     * If #1 returns 401 after #2 started,
+                     * #1 must NOT log the user out.
+                     */
+
+                    if (
+                        state.fetchUserRequestId !==
+                        action.meta.requestId
+                    ) {
+
+                        return;
+                    }
+
+
+                    state.fetchUserRequestId =
+                        null;
+
+
+                    /*
+                     * Only clear authentication for
+                     * the latest request.
+                     */
 
                     state.isLogin = false;
 
@@ -336,6 +412,9 @@ const loginSlice = createSlice({
                     state.isLogin = false;
 
                     state.user = null;
+
+                    state.fetchUserRequestId =
+                        null;
 
                 }
             );

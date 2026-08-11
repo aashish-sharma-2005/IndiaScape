@@ -114,12 +114,6 @@ const postLogin = async (req, res) => {
                         user.favoritePlaces || [],
                 }
             );
-
-            console.log(
-                "Socket → userLoggedIn:",
-                user.email
-            );
-
         } catch (socketError) {
 
             console.log(
