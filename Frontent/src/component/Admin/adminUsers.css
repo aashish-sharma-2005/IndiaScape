@@ -905,3 +905,150 @@
     }
 
 }
+/* =====================================================
+   DELETE CONFIRMATION MODAL
+===================================================== */
+
+.admin-delete-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(20, 12, 6, 0.65);
+    backdrop-filter: blur(8px);
+}
+
+.admin-delete-modal {
+    width: 100%;
+    max-width: 440px;
+
+    padding: 34px 30px;
+
+    text-align: center;
+
+    background: #fffaf4;
+
+    border: 1px solid rgba(120, 72, 30, 0.15);
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.25);
+
+    animation: deleteModalIn 0.2s ease;
+}
+
+@keyframes deleteModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.admin-delete-modal-icon {
+    width: 64px;
+    height: 64px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(180, 45, 35, 0.10);
+
+    font-size: 28px;
+}
+
+.admin-delete-modal h2 {
+    margin: 0 0 10px;
+
+    color: #24180f;
+
+    font-size: 25px;
+}
+
+.admin-delete-modal p {
+    margin: 0 auto 8px;
+
+    max-width: 350px;
+
+    color: #6e5a4b;
+
+    line-height: 1.6;
+}
+
+.admin-delete-modal p strong {
+    color: #24180f;
+}
+
+.admin-delete-warning {
+    display: block;
+
+    margin-bottom: 25px;
+
+    color: #a33a30;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.admin-delete-modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.admin-delete-modal-actions button {
+    flex: 1;
+
+    min-height: 46px;
+
+    border: none;
+    border-radius: 11px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.admin-delete-modal-actions button:hover {
+    transform: translateY(-1px);
+}
+
+.admin-delete-modal-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.admin-delete-cancel {
+    background: #eee4d8;
+    color: #4d3828;
+}
+
+.admin-delete-confirm {
+    background: #a33a30;
+    color: white;
+}
+
+.admin-delete-confirm:hover {
+    background: #8f2f27;
+}

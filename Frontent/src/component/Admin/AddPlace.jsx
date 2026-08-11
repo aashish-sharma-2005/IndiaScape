@@ -8,24 +8,31 @@ import { toast } from "react-toastify";
 function AddPlace({ onClose, editPlace }) {
     const [states, setStates] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
+
     const [existingPhotos, setExistingPhotos] = useState(
         editPlace?.photos || []
     );
 
-    const [deletingImage, setDeletingImage] = useState(null);
-
     useEffect(() => {
         const getStates = async () => {
             try {
-                const response = await fetch("http://localhost:3000/admin/stateData", {
-                    credentials: "include"
-                });
+                const response = await fetch(
+                    "http://localhost:3000/admin/stateData",
+                    {
+                        credentials: "include"
+                    }
+                );
+
                 const result = await response.json();
-                if (result.status) setStates(result.states);
+
+                if (result.status) {
+                    setStates(result.states);
+                }
             } catch (error) {
                 toast.error("States load nahi hui");
             }
         };
+
         getStates();
     }, []);
 
@@ -37,7 +44,9 @@ function AddPlace({ onClose, editPlace }) {
                 values[field.name] = [];
             } else if (field.name === "state_id") {
                 values[field.name] =
-                    editPlace.state_id?._id || editPlace.state_id || "";
+                    editPlace.state_id?._id ||
+                    editPlace.state_id ||
+                    "";
             } else {
                 values[field.name] = editPlace[field.name] || "";
             }
@@ -52,6 +61,12 @@ function AddPlace({ onClose, editPlace }) {
 
         return values;
     }, {});
+
+    /*
+    =====================================================
+    VALIDATION
+    =====================================================
+    */
 
     const validationSchema = Yup.object(
         placeFields.reduce((schema, field) => {
@@ -70,7 +85,10 @@ function AddPlace({ onClose, editPlace }) {
                     schema[field.name] = Yup.string()
                         .trim()
                         .required(`${field.label} is required`)
-                        .min(20, `${field.label} must be at least 20 characters`);
+                        .min(
+                            20,
+                            `${field.label} must be at least 20 characters`
+                        );
                     break;
 
                 case "required":
@@ -80,8 +98,48 @@ function AddPlace({ onClose, editPlace }) {
                     break;
 
                 case "images":
-                    schema[field.name] = Yup.array()
-                        .min(1, `${field.label} is required`);
+                    /*
+                    =================================================
+                    ADD PLACE
+                    -------------------------------------------------
+                    New place MUST have at least one image.
+
+                    EDIT PLACE
+                    -------------------------------------------------
+                    If an existing image is already present,
+                    selecting a new image is NOT mandatory.
+
+                    If all existing images are deleted,
+                    then a new image IS required.
+                    =================================================
+                    */
+
+                    if (editPlace) {
+                        schema[field.name] = Yup.array().test(
+                            "edit-images",
+                            `${field.label} is required`,
+                            function (value) {
+                                const newImages = value || [];
+
+                                const hasExistingImages =
+                                    existingPhotos.length > 0;
+
+                                const hasNewImages =
+                                    newImages.length > 0;
+
+                                return (
+                                    hasExistingImages ||
+                                    hasNewImages
+                                );
+                            }
+                        );
+                    } else {
+                        schema[field.name] = Yup.array().min(
+                            1,
+                            `${field.label} is required`
+                        );
+                    }
+
                     break;
 
                 default:
@@ -92,7 +150,19 @@ function AddPlace({ onClose, editPlace }) {
         }, {})
     );
 
-    function renderField(field, values, setFieldValue, errors, touched) {
+    /*
+    =====================================================
+    RENDER FIELD
+    =====================================================
+    */
+
+    function renderField(
+        field,
+        values,
+        setFieldValue,
+        errors,
+        touched
+    ) {
         let input;
 
         switch (field.type) {
@@ -102,7 +172,12 @@ function AddPlace({ onClose, editPlace }) {
                         name={field.name}
                         placeholder={field.placeholder}
                         value={values[field.name] || ""}
-                        onChange={(e) => setFieldValue(field.name, e.target.value)}
+                        onChange={(e) =>
+                            setFieldValue(
+                                field.name,
+                                e.target.value
+                            )
+                        }
                     />
                 );
                 break;
@@ -112,12 +187,22 @@ function AddPlace({ onClose, editPlace }) {
                     <select
                         name={field.name}
                         value={values[field.name] || ""}
-                        onChange={(e) => setFieldValue(field.name, e.target.value)}
+                        onChange={(e) =>
+                            setFieldValue(
+                                field.name,
+                                e.target.value
+                            )
+                        }
                     >
-                        <option value="">{field.placeholder}</option>
+                        <option value="">
+                            {field.placeholder}
+                        </option>
 
                         {states.map((state) => (
-                            <option key={state._id} value={state._id}>
+                            <option
+                                key={state._id}
+                                value={state._id}
+                            >
                                 {state.name}
                             </option>
                         ))}
@@ -131,7 +216,12 @@ function AddPlace({ onClose, editPlace }) {
                         type="checkbox"
                         name={field.name}
                         checked={values[field.name] || false}
-                        onChange={(e) => setFieldValue(field.name, e.target.checked)}
+                        onChange={(e) =>
+                            setFieldValue(
+                                field.name,
+                                e.target.checked
+                            )
+                        }
                     />
                 );
                 break;
@@ -154,7 +244,9 @@ function AddPlace({ onClose, editPlace }) {
                                         <button
                                             type="button"
                                             className="delete-image-btn"
-                                            onClick={() => deleteImage(photo)}
+                                            onClick={() =>
+                                                deleteImage(photo)
+                                            }
                                         >
                                             🗑️
                                         </button>
@@ -185,7 +277,12 @@ function AddPlace({ onClose, editPlace }) {
                         name={field.name}
                         placeholder={field.placeholder}
                         value={values[field.name] || ""}
-                        onChange={(e) => setFieldValue(field.name, e.target.value)}
+                        onChange={(e) =>
+                            setFieldValue(
+                                field.name,
+                                e.target.value
+                            )
+                        }
                     />
                 );
         }
@@ -203,22 +300,42 @@ function AddPlace({ onClose, editPlace }) {
         );
     }
 
-    const validateData = async (validateForm, setTouched) => {
+    /*
+    =====================================================
+    VALIDATE DATA
+    =====================================================
+    */
+
+    const validateData = async (
+        validateForm,
+        setTouched
+    ) => {
         const errors = await validateForm();
 
         if (Object.keys(errors).length > 0) {
-            const touchedFields = placeFields.reduce((obj, field) => {
-                obj[field.name] = true;
-                return obj;
-            }, {});
+            const touchedFields = placeFields.reduce(
+                (obj, field) => {
+                    obj[field.name] = true;
+                    return obj;
+                },
+                {}
+            );
 
             setTouched(touchedFields);
+
             toast.error("Please fill all required fields");
+
             return false;
         }
 
         return true;
     };
+
+    /*
+    =====================================================
+    SAVE DRAFT
+    =====================================================
+    */
 
     const saveDraft = async (values) => {
         setIsSaving(true);
@@ -248,10 +365,17 @@ function AddPlace({ onClose, editPlace }) {
             const result = await response.json();
 
             if (result.status) {
-                toast.success(result.message || "Draft saved successfully");
+                toast.success(
+                    result.message ||
+                    "Draft saved successfully"
+                );
+
                 setTimeout(onClose, 500);
             } else {
-                toast.error(result.message || "Draft save nahi hua");
+                toast.error(
+                    result.message ||
+                    "Draft save nahi hua"
+                );
             }
         } catch (error) {
             toast.error("Server Error");
@@ -260,12 +384,21 @@ function AddPlace({ onClose, editPlace }) {
         }
     };
 
+    /*
+    =====================================================
+    PUBLISH PLACE
+    =====================================================
+    */
+
     const publishPlace = async (
         values,
         validateForm,
         setTouched
     ) => {
-        const isValid = await validateData(validateForm, setTouched);
+        const isValid = await validateData(
+            validateForm,
+            setTouched
+        );
 
         if (!isValid) return;
 
@@ -277,10 +410,16 @@ function AddPlace({ onClose, editPlace }) {
             Object.keys(values).forEach((key) => {
                 if (key === "placeImages") {
                     values[key].forEach((file) => {
-                        formData.append("placeImages", file);
+                        formData.append(
+                            "placeImages",
+                            file
+                        );
                     });
                 } else {
-                    formData.append(key, values[key]);
+                    formData.append(
+                        key,
+                        values[key]
+                    );
                 }
             });
 
@@ -297,13 +436,15 @@ function AddPlace({ onClose, editPlace }) {
 
             if (result.status) {
                 toast.success(
-                    result.message || "Place published successfully"
+                    result.message ||
+                    "Place published successfully"
                 );
 
                 setTimeout(onClose, 500);
             } else {
                 toast.error(
-                    result.message || "Place publish nahi hua"
+                    result.message ||
+                    "Place publish nahi hua"
                 );
             }
         } catch (error) {
@@ -313,12 +454,21 @@ function AddPlace({ onClose, editPlace }) {
         }
     };
 
+    /*
+    =====================================================
+    UPDATE PLACE
+    =====================================================
+    */
+
     const updatePlace = async (
         values,
         validateForm,
         setTouched
     ) => {
-        const isValid = await validateData(validateForm, setTouched);
+        const isValid = await validateData(
+            validateForm,
+            setTouched
+        );
 
         if (!isValid) return;
 
@@ -330,10 +480,16 @@ function AddPlace({ onClose, editPlace }) {
             Object.keys(values).forEach((key) => {
                 if (key === "placeImages") {
                     values[key].forEach((file) => {
-                        formData.append("placeImages", file);
+                        formData.append(
+                            "placeImages",
+                            file
+                        );
                     });
                 } else {
-                    formData.append(key, values[key]);
+                    formData.append(
+                        key,
+                        values[key]
+                    );
                 }
             });
 
@@ -350,13 +506,15 @@ function AddPlace({ onClose, editPlace }) {
 
             if (result.status) {
                 toast.success(
-                    result.message || "Place updated successfully"
+                    result.message ||
+                    "Place updated successfully"
                 );
 
                 setTimeout(onClose, 500);
             } else {
                 toast.error(
-                    result.message || "Place update nahi hua"
+                    result.message ||
+                    "Place update nahi hua"
                 );
             }
         } catch (error) {
@@ -366,9 +524,15 @@ function AddPlace({ onClose, editPlace }) {
             setIsSaving(false);
         }
     };
+
+    /*
+    =====================================================
+    DELETE IMAGE
+    =====================================================
+    */
+
     const deleteImage = async (photo) => {
         try {
-            console.log(`http://localhost:3000/admin/place/${editPlace._id}/image`);
             const response = await fetch(
                 `http://localhost:3000/admin/place/${editPlace._id}/image`,
                 {
@@ -387,15 +551,26 @@ function AddPlace({ onClose, editPlace }) {
 
             if (result.status) {
                 setExistingPhotos(result.photos);
-                toast.success("Image deleted successfully");
+
+                toast.success(
+                    "Image deleted successfully"
+                );
             } else {
                 toast.error(result.message);
             }
-
         } catch (error) {
-            toast.error("Image delete failed");
+            toast.error(
+                "Image delete failed"
+            );
         }
     };
+
+    /*
+    =====================================================
+    UI
+    =====================================================
+    */
+
     return (
         <div
             className="add-place-overlay"
@@ -409,7 +584,9 @@ function AddPlace({ onClose, editPlace }) {
 
             <div
                 className="add-place-modal"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) =>
+                    e.stopPropagation()
+                }
             >
                 <div className="add-place-modal-header">
                     <div>
@@ -438,8 +615,10 @@ function AddPlace({ onClose, editPlace }) {
                 <Formik
                     initialValues={initialValues}
                     enableReinitialize
-                    validationSchema={validationSchema}
-                    onSubmit={() => { }}
+                    validationSchema={
+                        validationSchema
+                    }
+                    onSubmit={() => {}}
                 >
                     {({
                         values,
@@ -451,24 +630,30 @@ function AddPlace({ onClose, editPlace }) {
                     }) => (
                         <Form className="add-place-form">
                             <div className="add-place-modal-body">
-                                {placeFields.map((field) => (
-                                    <div
-                                        className="form-group"
-                                        key={field.name}
-                                    >
-                                        <label>
-                                            {field.label}
-                                        </label>
+                                {placeFields.map(
+                                    (field) => (
+                                        <div
+                                            className="form-group"
+                                            key={
+                                                field.name
+                                            }
+                                        >
+                                            <label>
+                                                {
+                                                    field.label
+                                                }
+                                            </label>
 
-                                        {renderField(
-                                            field,
-                                            values,
-                                            setFieldValue,
-                                            errors,
-                                            touched
-                                        )}
-                                    </div>
-                                ))}
+                                            {renderField(
+                                                field,
+                                                values,
+                                                setFieldValue,
+                                                errors,
+                                                touched
+                                            )}
+                                        </div>
+                                    )
+                                )}
 
                                 <div className="place-action-buttons">
                                     {editPlace ? (
@@ -482,7 +667,9 @@ function AddPlace({ onClose, editPlace }) {
                                                     setTouched
                                                 )
                                             }
-                                            disabled={isSaving}
+                                            disabled={
+                                                isSaving
+                                            }
                                         >
                                             Update Data
                                         </button>
@@ -492,9 +679,13 @@ function AddPlace({ onClose, editPlace }) {
                                                 type="button"
                                                 className="save-draft-btn"
                                                 onClick={() =>
-                                                    saveDraft(values)
+                                                    saveDraft(
+                                                        values
+                                                    )
                                                 }
-                                                disabled={isSaving}
+                                                disabled={
+                                                    isSaving
+                                                }
                                             >
                                                 Save Draft
                                             </button>
@@ -509,7 +700,9 @@ function AddPlace({ onClose, editPlace }) {
                                                         setTouched
                                                     )
                                                 }
-                                                disabled={isSaving}
+                                                disabled={
+                                                    isSaving
+                                                }
                                             >
                                                 Publish
                                             </button>

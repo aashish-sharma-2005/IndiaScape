@@ -114,7 +114,7 @@ function App() {
         location.pathname === "/login" ||
         location.pathname === "/signup" ||
         location.pathname ===
-            "/verify-otp";
+        "/verify-otp";
 
 
     // =========================================
@@ -123,32 +123,43 @@ function App() {
 
     useEffect(() => {
 
-        const initializeApp =
-            async () => {
+        let isActive = true;
 
-                try {
+        const initializeApp = async () => {
 
-                    // =================================
-                    // CHECK CURRENT USER
-                    // =================================
+            try {
 
-                    await dispatch(
-                        fetchUser()
-                    ).unwrap();
+                await dispatch(
+                    fetchUser()
+                ).unwrap();
 
-                } catch (error) {
+            } catch (error) {
 
-                    console.log(
-                        "User not authenticated"
-                    );
+                console.log(
+                    "User not authenticated"
+                );
 
-                } finally {
+            } finally {
+
+                // =========================================
+                // IMPORTANT
+                //
+                // Only the latest active effect can
+                // finish the initial loading state.
+                //
+                // Prevents redirect race condition
+                // during React development StrictMode.
+                // =========================================
+
+                if (isActive) {
 
                     setLoading(false);
 
                 }
 
-            };
+            }
+
+        };
 
 
         initializeApp();
@@ -161,6 +172,17 @@ function App() {
         dispatch(
             fetchStatesData()
         );
+
+
+        // =========================================
+        // CLEANUP
+        // =========================================
+
+        return () => {
+
+            isActive = false;
+
+        };
 
     }, [dispatch]);
 
@@ -650,11 +672,10 @@ function App() {
             ================================= */}
 
             <main
-                className={`app-main ${
-                    isAuthPage
+                className={`app-main ${isAuthPage
                         ? "auth-main"
                         : ""
-                }`}
+                    }`}
             >
 
                 <Routes>

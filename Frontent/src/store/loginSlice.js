@@ -3,7 +3,6 @@ import {
     createAsyncThunk
 } from "@reduxjs/toolkit";
 
-
 // ========================================
 // LOGOUT USER
 // ========================================
@@ -52,7 +51,6 @@ export const logoutUser = createAsyncThunk(
 
     }
 );
-
 
 // ========================================
 // VISIT STATE
@@ -115,7 +113,6 @@ export const visitState = createAsyncThunk(
     }
 );
 
-
 // ========================================
 // FETCH CURRENT USER
 // ========================================
@@ -130,30 +127,87 @@ export const fetchUser = createAsyncThunk(
 
         try {
 
+            // =========================================
+            // IMPORTANT
+            //
+            // Add unique query parameter.
+            //
+            // This prevents browser/server from
+            // returning 304 Not Modified.
+            // =========================================
+
             const response = await fetch(
-                "http://localhost:3000/me",
+                `http://localhost:3000/me?_=${Date.now()}`,
                 {
                     method: "GET",
                     credentials: "include",
+
+                    cache: "no-store",
+
+                    headers: {
+                        "Cache-Control":
+                            "no-cache",
+                        "Pragma":
+                            "no-cache",
+                    },
                 }
             );
+
+            // ========================================
+            // AUTH FAILURE
+            // ========================================
 
             if (response.status === 401) {
 
                 return rejectWithValue({
-                    message: "Unauthorized",
+                    message:
+                        "Unauthorized",
                     status: 401,
                 });
 
             }
 
+            // ========================================
+            // BLOCKED / FORBIDDEN
+            // ========================================
+
+            if (response.status === 403) {
+
+                return rejectWithValue({
+                    message:
+                        "Access denied",
+                    status: 403,
+                });
+
+            }
+
+            // ========================================
+            // OTHER ERROR
+            // ========================================
+
+            if (!response.ok) {
+
+                return rejectWithValue({
+                    message:
+                        `Request failed with status ${response.status}`,
+                    status:
+                        response.status,
+                });
+
+            }
+
+            // ========================================
+            // READ JSON
+            // ========================================
+
             const result =
                 await response.json();
 
-            if (
-                !response.ok ||
-                !result.status
-            ) {
+            // ========================================
+            // CHECK RESPONSE
+            // ========================================
+
+            if (!result.status) {
 
                 return rejectWithValue({
                     message:
@@ -166,21 +220,29 @@ export const fetchUser = createAsyncThunk(
 
             }
 
+            // ========================================
+            // SUCCESS
+            // ========================================
+
             return result.user;
 
         } catch (error) {
 
-            console.log(error);
+            console.log(
+                "fetchUser error:",
+                error
+            );
 
             return rejectWithValue({
-                message: "Server Error",
+                message:
+                    "Server Error",
+                status: 500,
             });
 
         }
 
     }
 );
-
 
 // ========================================
 // LOGIN SLICE
@@ -195,10 +257,6 @@ const loginSlice = createSlice({
         isLogin: false,
 
         user: null,
-
-        // =================================
-        // AUTH REQUEST TRACKING
-        // =================================
 
         fetchUserRequestId: null,
 
@@ -225,7 +283,6 @@ const loginSlice = createSlice({
 
         },
 
-
         // ========================================
         // UPDATE USER
         // ========================================
@@ -246,7 +303,6 @@ const loginSlice = createSlice({
 
         },
 
-
         // ========================================
         // LOGOUT
         // ========================================
@@ -264,7 +320,6 @@ const loginSlice = createSlice({
 
     },
 
-
     // ========================================
     // ASYNC ACTIONS
     // ========================================
@@ -272,7 +327,6 @@ const loginSlice = createSlice({
     extraReducers: (builder) => {
 
         builder
-
 
             // ========================================
             // FETCH USER STARTED
@@ -282,20 +336,11 @@ const loginSlice = createSlice({
                 fetchUser.pending,
                 (state, action) => {
 
-                    /*
-                     * Save the ID of the latest
-                     * fetchUser request.
-                     *
-                     * If an older request finishes
-                     * later, we will ignore it.
-                     */
-
                     state.fetchUserRequestId =
                         action.meta.requestId;
 
                 }
             )
-
 
             // ========================================
             // FETCH USER SUCCESS
@@ -304,11 +349,6 @@ const loginSlice = createSlice({
             .addCase(
                 fetchUser.fulfilled,
                 (state, action) => {
-
-                    /*
-                     * Only the latest fetchUser
-                     * request can update auth state.
-                     */
 
                     if (
                         state.fetchUserRequestId !==
@@ -329,7 +369,6 @@ const loginSlice = createSlice({
                 }
             )
 
-
             // ========================================
             // FETCH USER FAILED
             // ========================================
@@ -337,24 +376,6 @@ const loginSlice = createSlice({
             .addCase(
                 fetchUser.rejected,
                 (state, action) => {
-
-                    /*
-                     * VERY IMPORTANT
-                     *
-                     * If this is an old /me request,
-                     * ignore its failure.
-                     *
-                     * Example:
-                     *
-                     * App.jsx
-                     *    fetchUser #1
-                     *
-                     * Login.jsx
-                     *    fetchUser #2
-                     *
-                     * If #1 returns 401 after #2 started,
-                     * #1 must NOT log the user out.
-                     */
 
                     if (
                         state.fetchUserRequestId !==
@@ -364,23 +385,35 @@ const loginSlice = createSlice({
                         return;
                     }
 
-
                     state.fetchUserRequestId =
                         null;
 
+                    const status =
+                        action.payload?.status;
 
-                    /*
-                     * Only clear authentication for
-                     * the latest request.
-                     */
+                    // ========================================
+                    // REAL AUTH FAILURE
+                    // ========================================
 
-                    state.isLogin = false;
+                    if (
+                        status === 401 ||
+                        status === 403
+                    ) {
 
-                    state.user = null;
+                        state.isLogin = false;
+
+                        state.user = null;
+
+                    }
+
+                    // ========================================
+                    // SERVER / NETWORK / CACHE ERROR
+                    //
+                    // DON'T LOG USER OUT
+                    // ========================================
 
                 }
             )
-
 
             // ========================================
             // VISIT STATE
@@ -399,7 +432,6 @@ const loginSlice = createSlice({
 
                 }
             )
-
 
             // ========================================
             // LOGOUT SUCCESS
@@ -423,12 +455,10 @@ const loginSlice = createSlice({
 
 });
 
-
 export const {
     loginSuccess,
     updateUser,
     logout,
 } = loginSlice.actions;
-
 
 export default loginSlice.reducer;

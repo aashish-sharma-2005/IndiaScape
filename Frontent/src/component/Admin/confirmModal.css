@@ -1,0 +1,215 @@
+/* =====================================================
+   REUSABLE CONFIRM MODAL
+===================================================== */
+
+.confirm-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(20, 12, 6, 0.65);
+
+    backdrop-filter: blur(8px);
+}
+
+.confirm-modal {
+    width: 100%;
+    max-width: 440px;
+
+    padding: 34px 30px;
+
+    text-align: center;
+
+    background: #fffaf4;
+
+    border: 1px solid rgba(120, 72, 30, 0.15);
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.25);
+
+    animation: confirmModalIn 0.2s ease;
+}
+
+@keyframes confirmModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =====================================================
+   ICON
+===================================================== */
+
+.confirm-modal-icon {
+    width: 64px;
+    height: 64px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    font-size: 28px;
+}
+
+/* DELETE */
+
+.confirm-modal.danger
+    .confirm-modal-icon {
+    background: rgba(180, 45, 35, 0.10);
+}
+
+/* BLOCK */
+
+.confirm-modal.warning
+    .confirm-modal-icon {
+    background: rgba(190, 120, 30, 0.12);
+}
+
+/* UNBLOCK */
+
+.confirm-modal.success
+    .confirm-modal-icon {
+    background: rgba(45, 130, 80, 0.12);
+}
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.confirm-modal h2 {
+    margin: 0 0 10px;
+
+    color: #24180f;
+
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.confirm-modal p {
+    max-width: 360px;
+
+    margin: 0 auto 8px;
+
+    color: #6e5a4b;
+
+    line-height: 1.6;
+}
+
+.confirm-modal-warning {
+    display: block;
+
+    margin-bottom: 25px;
+
+    color: #a33a30;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.confirm-modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.confirm-modal-actions button {
+    flex: 1;
+
+    min-height: 46px;
+
+    border: none;
+    border-radius: 11px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.confirm-modal-actions button:hover {
+    transform: translateY(-1px);
+}
+
+.confirm-modal-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+/* =====================================================
+   CANCEL
+===================================================== */
+
+.confirm-modal-cancel {
+    background: #eee4d8;
+    color: #4d3828;
+}
+
+/* =====================================================
+   CONFIRM TYPES
+===================================================== */
+
+/* DELETE */
+
+.confirm-modal.danger
+    .confirm-modal-confirm {
+    background: #a33a30;
+    color: white;
+}
+
+.confirm-modal.danger
+    .confirm-modal-confirm:hover {
+    background: #8f2f27;
+}
+
+/* BLOCK */
+
+.confirm-modal.warning
+    .confirm-modal-confirm {
+    background: #b87820;
+    color: white;
+}
+
+.confirm-modal.warning
+    .confirm-modal-confirm:hover {
+    background: #9d6418;
+}
+
+/* UNBLOCK */
+
+.confirm-modal.success
+    .confirm-modal-confirm {
+    background: #397a52;
+    color: white;
+}
+
+.confirm-modal.success
+    .confirm-modal-confirm:hover {
+    background: #2f6845;
+}

@@ -72,7 +72,8 @@ const postLogin = async (req, res) => {
             payload,
             process.env.SECRET_KEY,
             {
-                expiresIn: "1h",
+                // 24 HOURS
+                expiresIn: "24h",
             }
         );
 
@@ -87,7 +88,13 @@ const postLogin = async (req, res) => {
                 httpOnly: true,
                 secure: false,
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 60,
+
+                // 24 HOURS
+                maxAge:
+                    1000 *
+                    60 *
+                    60 *
+                    24,
             }
         );
 
@@ -108,12 +115,15 @@ const postLogin = async (req, res) => {
                     role: user.role,
                     status: user.status,
                     lastLogin: user.lastLogin,
+
                     visitedStates:
                         user.visitedStates || [],
+
                     favoritePlaces:
                         user.favoritePlaces || [],
                 }
             );
+
         } catch (socketError) {
 
             console.log(
