@@ -48,8 +48,7 @@ function AdminUsers() {
                 }
             );
 
-            const result =
-                await response.json();
+            const result = await response.json();
 
             if (!response.ok || !result.status) {
 
@@ -87,13 +86,13 @@ function AdminUsers() {
         }
     };
 
+    // ========================================
+    // SOCKET
+    // ========================================
+
     useEffect(() => {
 
         fetchUsers();
-
-        // ========================================
-        // REAL-TIME USER LOGIN
-        // ========================================
 
         const handleUserLoggedIn = (loggedInUser) => {
 
@@ -127,10 +126,6 @@ function AdminUsers() {
 
             });
 
-            // ========================================
-            // UPDATE SELECTED USER
-            // ========================================
-
             setSelectedUser((currentUser) => {
 
                 if (
@@ -155,10 +150,6 @@ function AdminUsers() {
             "userLoggedIn",
             handleUserLoggedIn
         );
-
-        // ========================================
-        // CLEANUP
-        // ========================================
 
         return () => {
 
@@ -204,6 +195,7 @@ function AdminUsers() {
                 matchesSearch &&
                 matchesStatus
             );
+
         });
 
     }, [
@@ -232,6 +224,7 @@ function AdminUsers() {
                 minute: "2-digit",
             }
         );
+
     };
 
     // ========================================
@@ -252,6 +245,7 @@ function AdminUsers() {
                 year: "numeric",
             }
         );
+
     };
 
     // ========================================
@@ -319,6 +313,37 @@ function AdminUsers() {
 
             }
 
+            // Update stats immediately
+            setStats((current) => {
+
+                if (user.status === "blocked") {
+
+                    return {
+                        ...current,
+                        activeUsers:
+                            current.activeUsers + 1,
+                        blockedUsers:
+                            Math.max(
+                                0,
+                                current.blockedUsers - 1
+                            ),
+                    };
+
+                }
+
+                return {
+                    ...current,
+                    activeUsers:
+                        Math.max(
+                            0,
+                            current.activeUsers - 1
+                        ),
+                    blockedUsers:
+                        current.blockedUsers + 1,
+                };
+
+            });
+
         } catch (error) {
 
             console.log(error);
@@ -333,6 +358,7 @@ function AdminUsers() {
             setActionLoading(false);
 
         }
+
     };
 
     // ========================================
@@ -385,11 +411,13 @@ function AdminUsers() {
 
             setStats((current) => ({
                 ...current,
+
                 totalUsers:
                     Math.max(
                         0,
                         current.totalUsers - 1
                     ),
+
                 activeUsers:
                     user.status === "blocked"
                         ? current.activeUsers
@@ -397,6 +425,7 @@ function AdminUsers() {
                             0,
                             current.activeUsers - 1
                         ),
+
                 blockedUsers:
                     user.status === "blocked"
                         ? Math.max(
@@ -420,6 +449,7 @@ function AdminUsers() {
             setActionLoading(false);
 
         }
+
     };
 
     // ========================================
@@ -464,6 +494,7 @@ function AdminUsers() {
             );
 
         }
+
     };
 
     // ========================================
@@ -487,6 +518,7 @@ function AdminUsers() {
 
             </section>
         );
+
     }
 
     // ========================================
@@ -518,6 +550,7 @@ function AdminUsers() {
 
             </section>
         );
+
     }
 
     return (
@@ -561,9 +594,7 @@ function AdminUsers() {
                     </div>
 
                     <div>
-                        <span>
-                            Total Users
-                        </span>
+                        <span>Total Users</span>
 
                         <strong>
                             {stats.totalUsers}
@@ -579,9 +610,7 @@ function AdminUsers() {
                     </div>
 
                     <div>
-                        <span>
-                            Active Users
-                        </span>
+                        <span>Active Users</span>
 
                         <strong>
                             {stats.activeUsers}
@@ -597,9 +626,7 @@ function AdminUsers() {
                     </div>
 
                     <div>
-                        <span>
-                            Blocked Users
-                        </span>
+                        <span>Blocked Users</span>
 
                         <strong>
                             {stats.blockedUsers}
@@ -615,9 +642,7 @@ function AdminUsers() {
                     </div>
 
                     <div>
-                        <span>
-                            New Users
-                        </span>
+                        <span>New Users</span>
 
                         <strong>
                             {stats.newUsers}
@@ -690,222 +715,237 @@ function AdminUsers() {
             </div>
 
             {/* ========================================
-                TABLE
+                USER CARDS
             ======================================== */}
 
-            <div className="admin-users-table-wrapper">
+            <div className="admin-users-grid">
 
-                <table className="admin-users-table">
+                {filteredUsers.length === 0 ? (
 
-                    <thead>
+                    <div className="admin-users-empty-card">
 
-                        <tr>
+                        <div>
+                            🔎
+                        </div>
 
-                            <th>
-                                USER
-                            </th>
+                        <h3>
+                            No users found
+                        </h3>
 
-                            <th>
-                                EMAIL
-                            </th>
+                        <p>
+                            Try changing your search
+                            or status filter.
+                        </p>
 
-                            <th>
-                                JOINED
-                            </th>
+                    </div>
 
-                            <th>
-                                LAST LOGIN
-                            </th>
+                ) : (
 
-                            <th>
-                                VISITED
-                            </th>
+                    filteredUsers.map((user) => {
 
-                            <th>
-                                FAVORITES
-                            </th>
+                        const status =
+                            user.status || "active";
 
-                            <th>
-                                STATUS
-                            </th>
+                        const isBlocked =
+                            status === "blocked";
 
-                            <th>
-                                ACTION
-                            </th>
+                        return (
 
-                        </tr>
+                            <article
+                                className="admin-user-card"
+                                key={user._id}
+                            >
 
-                    </thead>
+                                {/* USER HEADER */}
 
-                    <tbody>
+                                <div className="admin-user-card-header">
 
-                        {filteredUsers.length === 0 ? (
+                                    <div className="admin-user-card-identity">
 
-                            <tr>
+                                        <div className="admin-user-avatar">
 
-                                <td
-                                    colSpan="8"
-                                    className="admin-users-empty"
-                                >
-                                    No users found.
-                                </td>
+                                            {user.name
+                                                ?.charAt(0)
+                                                ?.toUpperCase()}
 
-                            </tr>
+                                        </div>
 
-                        ) : (
+                                        <div className="admin-user-card-name">
 
-                            filteredUsers.map((user) => {
+                                            <h3>
+                                                {user.name}
+                                            </h3>
 
-                                const status =
-                                    user.status ||
-                                    "active";
+                                            <p>
+                                                {user.email}
+                                            </p>
 
-                                return (
-                                    <tr
-                                        key={user._id}
+                                        </div>
+
+                                    </div>
+
+                                    <span
+                                        className={
+                                            `admin-user-status ${status}`
+                                        }
                                     >
+                                        {status}
+                                    </span>
 
-                                        <td>
+                                </div>
 
-                                            <div className="admin-user-name">
+                                {/* BASIC INFORMATION */}
 
-                                                <div className="admin-user-avatar">
+                                <div className="admin-user-info-grid">
 
-                                                    {user.name
-                                                        ?.charAt(0)
-                                                        ?.toUpperCase()}
+                                    <div className="admin-user-info-box">
 
-                                                </div>
+                                        <span>
+                                            JOINED
+                                        </span>
 
-                                                <strong>
-                                                    {user.name}
-                                                </strong>
-
-                                            </div>
-
-                                        </td>
-
-                                        <td>
-                                            {user.email}
-                                        </td>
-
-                                        <td>
+                                        <strong>
                                             {formatJoinedDate(
                                                 user.createdAt
                                             )}
-                                        </td>
+                                        </strong>
 
-                                        <td>
+                                    </div>
 
-                                            <span
-                                                className={
-                                                    user.lastLogin
-                                                        ? "admin-last-login"
-                                                        : "admin-last-login never"
-                                                }
-                                            >
-                                                {formatDate(
-                                                    user.lastLogin
-                                                )}
+                                    <div className="admin-user-info-box">
+
+                                        <span>
+                                            LAST LOGIN
+                                        </span>
+
+                                        <strong
+                                            className={
+                                                !user.lastLogin
+                                                    ? "never"
+                                                    : ""
+                                            }
+                                        >
+                                            {formatDate(
+                                                user.lastLogin
+                                            )}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                                {/* ACTIVITY */}
+
+                                <div className="admin-user-activity">
+
+                                    <div className="admin-user-activity-item">
+
+                                        <span>
+                                            VISITED STATES
+                                        </span>
+
+                                        <strong>
+                                            {user.visitedStates
+                                                ?.length || 0}
+                                        </strong>
+
+                                    </div>
+
+                                    <div className="admin-user-activity-item">
+
+                                        <span>
+                                            FAVORITES
+                                        </span>
+
+                                        <strong>
+                                            {user.favoritePlaces
+                                                ?.length || 0}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+                                {/* ACTIONS */}
+
+                                <div className="admin-user-card-actions">
+
+                                    <div className="admin-user-actions-title">
+                                        <span>
+                                            ACTIONS
+                                        </span>
+                                    </div>
+
+                                    <div className="admin-user-actions">
+
+                                        <button
+                                            className="admin-action-view"
+                                            onClick={() =>
+                                                handleViewUser(
+                                                    user
+                                                )
+                                            }
+                                        >
+                                            <span>
+                                                👁
+                                            </span>
+                                            View User
+                                        </button>
+
+                                        <button
+                                            className={
+                                                isBlocked
+                                                    ? "admin-action-unblock"
+                                                    : "admin-action-block"
+                                            }
+                                            disabled={
+                                                actionLoading
+                                            }
+                                            onClick={() =>
+                                                handleToggleStatus(
+                                                    user
+                                                )
+                                            }
+                                        >
+                                            <span>
+                                                {isBlocked
+                                                    ? "✓"
+                                                    : "⊘"}
                                             </span>
 
-                                        </td>
+                                            {isBlocked
+                                                ? "Unblock"
+                                                : "Block"}
+                                        </button>
 
-                                        <td>
-
-                                            <span className="admin-user-count">
-
-                                                {user.visitedStates
-                                                    ?.length || 0}
-
+                                        <button
+                                            className="admin-action-delete"
+                                            disabled={
+                                                actionLoading
+                                            }
+                                            onClick={() =>
+                                                handleDelete(
+                                                    user
+                                                )
+                                            }
+                                        >
+                                            <span>
+                                                🗑
                                             </span>
+                                            Delete
+                                        </button>
 
-                                        </td>
+                                    </div>
 
-                                        <td>
+                                </div>
 
-                                            <span className="admin-user-count">
+                            </article>
 
-                                                {user.favoritePlaces
-                                                    ?.length || 0}
+                        );
 
-                                            </span>
+                    })
 
-                                        </td>
-
-                                        <td>
-
-                                            <span
-                                                className={`admin-user-status ${status}`}
-                                            >
-                                                {status}
-                                            </span>
-
-                                        </td>
-
-                                        <td>
-
-                                            <div className="admin-user-actions">
-
-                                                <button
-                                                    className="admin-action-view"
-                                                    onClick={() =>
-                                                        handleViewUser(
-                                                            user
-                                                        )
-                                                    }
-                                                >
-                                                    View
-                                                </button>
-
-                                                <button
-                                                    className={
-                                                        status ===
-                                                            "blocked"
-                                                            ? "admin-action-unblock"
-                                                            : "admin-action-block"
-                                                    }
-                                                    disabled={
-                                                        actionLoading
-                                                    }
-                                                    onClick={() =>
-                                                        handleToggleStatus(
-                                                            user
-                                                        )
-                                                    }
-                                                >
-                                                    {status ===
-                                                        "blocked"
-                                                        ? "Unblock"
-                                                        : "Block"}
-                                                </button>
-
-                                                <button
-                                                    className="admin-action-delete"
-                                                    disabled={
-                                                        actionLoading
-                                                    }
-                                                    onClick={() =>
-                                                        handleDelete(
-                                                            user
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-
-                                            </div>
-
-                                        </td>
-
-                                    </tr>
-                                );
-                            })
-                        )}
-
-                    </tbody>
-
-                </table>
+                )}
 
             </div>
 
@@ -916,13 +956,17 @@ function AdminUsers() {
             <div className="admin-users-result-count">
 
                 Showing{" "}
+
                 <strong>
                     {filteredUsers.length}
                 </strong>{" "}
+
                 of{" "}
+
                 <strong>
                     {users.length}
                 </strong>{" "}
+
                 users
 
             </div>
@@ -983,7 +1027,6 @@ function AdminUsers() {
                         <div className="admin-user-detail-grid">
 
                             <div>
-
                                 <span>
                                     Joined
                                 </span>
@@ -993,11 +1036,9 @@ function AdminUsers() {
                                         selectedUser.createdAt
                                     )}
                                 </strong>
-
                             </div>
 
                             <div>
-
                                 <span>
                                     Last Login
                                 </span>
@@ -1007,11 +1048,9 @@ function AdminUsers() {
                                         selectedUser.lastLogin
                                     )}
                                 </strong>
-
                             </div>
 
                             <div>
-
                                 <span>
                                     Visited States
                                 </span>
@@ -1021,11 +1060,9 @@ function AdminUsers() {
                                         .visitedStates
                                         ?.length || 0}
                                 </strong>
-
                             </div>
 
                             <div>
-
                                 <span>
                                     Favorite Places
                                 </span>
@@ -1035,7 +1072,6 @@ function AdminUsers() {
                                         .favoritePlaces
                                         ?.length || 0}
                                 </strong>
-
                             </div>
 
                         </div>

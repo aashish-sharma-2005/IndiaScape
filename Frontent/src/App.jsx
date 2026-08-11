@@ -29,6 +29,7 @@ import { Details } from "./screen/Details";
 // =========================================
 // FAVORITES
 // =========================================
+
 import FavoritePage from "./screen/Favorite";
 
 import Footer from "./screen/Navbar/Footer";
@@ -38,8 +39,16 @@ import Loading from "./screen/Loading/";
 import UserRoute from "./Guards/UserRoute";
 import AdminRoute from "./Guards/AdminRoutes";
 
-import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import {
+    useDispatch,
+    useSelector,
+} from "react-redux";
+
+import {
+    useEffect,
+    useState,
+} from "react";
+
 import AdminUsers from "./component/Admin/AdminUsers";
 
 import {
@@ -56,16 +65,39 @@ import {
     deletePlaceRealtime,
 } from "./store/placesSlice";
 
-import { fetchUser } from "./store/loginSlice";
+import {
+    fetchUser,
+    logout,
+} from "./store/loginSlice";
 
+
+// =====================================================
+// APP
+// =====================================================
 
 function App() {
 
     const dispatch = useDispatch();
-    const location = useLocation();
-    const navigate = useNavigate();
 
-    const [loading, setLoading] = useState(true);
+    const location =
+        useLocation();
+
+    const navigate =
+        useNavigate();
+
+
+    const [loading, setLoading] =
+        useState(true);
+
+
+    // =========================================
+    // CURRENT USER
+    // =========================================
+
+    const user = useSelector(
+        (state) =>
+            state.loginReducer.user
+    );
 
 
     // =========================================
@@ -73,12 +105,16 @@ function App() {
     // =========================================
 
     const isAdmin =
-        location.pathname.startsWith("/admin");
+        location.pathname.startsWith(
+            "/admin"
+        );
+
 
     const isAuthPage =
         location.pathname === "/login" ||
         location.pathname === "/signup" ||
-        location.pathname === "/verify-otp";
+        location.pathname ===
+            "/verify-otp";
 
 
     // =========================================
@@ -87,37 +123,41 @@ function App() {
 
     useEffect(() => {
 
-        const initializeApp = async () => {
+        const initializeApp =
+            async () => {
 
-            try {
+                try {
 
-                // Check currently logged-in user
-                await dispatch(
-                    fetchUser()
-                ).unwrap();
+                    // =================================
+                    // CHECK CURRENT USER
+                    // =================================
 
-            } catch (error) {
+                    await dispatch(
+                        fetchUser()
+                    ).unwrap();
 
-                // User is not logged in
-                console.log(
-                    "User not authenticated"
-                );
+                } catch (error) {
 
-            } finally {
+                    console.log(
+                        "User not authenticated"
+                    );
 
-                // VERY IMPORTANT
-                // Stop loading after auth check
-                setLoading(false);
+                } finally {
 
-            }
+                    setLoading(false);
 
-        };
+                }
+
+            };
 
 
         initializeApp();
 
 
-        // Fetch states from backend
+        // =========================================
+        // FETCH STATES
+        // =========================================
+
         dispatch(
             fetchStatesData()
         );
@@ -125,199 +165,318 @@ function App() {
     }, [dispatch]);
 
 
-    // =========================================
+    // =====================================================
     // REAL-TIME EVENTS
-    // =========================================
+    // =====================================================
 
     useEffect(() => {
+
+
+        // =================================================
+        // USER BLOCKED
+        // =================================================
+
+        const handleUserBlocked =
+            async (blockedUser) => {
+
+                console.log(
+                    "Socket → userBlocked:",
+                    blockedUser
+                );
+
+
+                // =========================================
+                // Make sure there is a logged-in user
+                // =========================================
+
+                if (!user?._id) {
+                    return;
+                }
+
+
+                // =========================================
+                // Check if THIS browser belongs
+                // to the blocked user
+                // =========================================
+
+                if (
+                    user._id.toString() !==
+                    blockedUser.userId.toString()
+                ) {
+
+                    return;
+                }
+
+
+                console.log(
+                    "Current user has been blocked."
+                );
+
+
+                // =========================================
+                // CLEAR BACKEND COOKIE
+                // =========================================
+
+                try {
+
+                    await fetch(
+                        "http://localhost:3000/logout",
+                        {
+                            method: "POST",
+                            credentials:
+                                "include",
+                        }
+                    );
+
+                } catch (error) {
+
+                    console.log(
+                        "Logout request error:",
+                        error
+                    );
+                }
+
+
+                // =========================================
+                // CLEAR REDUX LOGIN STATE
+                // =========================================
+
+                dispatch(
+                    logout()
+                );
+
+
+                // =========================================
+                // REDIRECT TO LOGIN
+                // =========================================
+
+                navigate(
+                    "/login",
+                    {
+                        replace: true,
+                    }
+                );
+
+            };
+
+
+        // =================================================
+        // USER UNBLOCKED
+        // =================================================
+
+        const handleUserUnblocked =
+            (updatedUser) => {
+
+                console.log(
+                    "Socket → userUnblocked:",
+                    updatedUser
+                );
+
+            };
+
 
         // =================================================
         // STATE ADDED
         // =================================================
 
-        const handleStateAdded = (newState) => {
+        const handleStateAdded =
+            (newState) => {
 
-            console.log(
-                "Socket → stateAdded:",
-                newState
-            );
+                console.log(
+                    "Socket → stateAdded:",
+                    newState
+                );
 
-            dispatch(
-                addStateRealtime(newState)
-            );
+                dispatch(
+                    addStateRealtime(
+                        newState
+                    )
+                );
 
-        };
+            };
 
 
         // =================================================
         // STATE UPDATED
         // =================================================
 
-        const handleStateUpdated = (updatedState) => {
+        const handleStateUpdated =
+            (updatedState) => {
 
-            console.log(
-                "Socket → stateUpdated:",
-                updatedState
-            );
+                console.log(
+                    "Socket → stateUpdated:",
+                    updatedState
+                );
 
-            dispatch(
-                updateState(updatedState)
-            );
+                dispatch(
+                    updateState(
+                        updatedState
+                    )
+                );
 
-        };
+            };
 
 
         // =================================================
         // STATE DELETED
         // =================================================
 
-        const handleStateDeleted = (deletedState) => {
+        const handleStateDeleted =
+            (deletedState) => {
 
-            console.log(
-                "Socket → stateDeleted:",
-                deletedState
-            );
-
-            dispatch(
-                deleteStateRealtime(
+                console.log(
+                    "Socket → stateDeleted:",
                     deletedState
-                )
-            );
+                );
 
-        };
+                dispatch(
+                    deleteStateRealtime(
+                        deletedState
+                    )
+                );
+
+            };
 
 
         // =================================================
         // STATE VISIBILITY
         // =================================================
 
-        const handleStateVisibilityUpdated = (
-            updatedState
-        ) => {
+        const handleStateVisibilityUpdated =
+            (updatedState) => {
 
-            console.log(
-                "Socket → stateVisibilityUpdated:",
-                updatedState
-            );
-
-            dispatch(
-                updateStateVisibility(
+                console.log(
+                    "Socket → stateVisibilityUpdated:",
                     updatedState
-                )
-            );
+                );
 
 
-            // =============================================
-            // If current state became hidden
-            // =============================================
+                dispatch(
+                    updateStateVisibility(
+                        updatedState
+                    )
+                );
 
-            if (
-                updatedState.visible === false
-            ) {
 
-                const currentPath =
-                    decodeURIComponent(
-                        location.pathname
-                    );
-
-                const statePath =
-                    `/dashboard/states/${updatedState.name}`;
-
+                // =========================================
+                // If current state became hidden
+                // =========================================
 
                 if (
-                    currentPath === statePath
+                    updatedState.visible ===
+                    false
                 ) {
 
-                    console.log(
-                        "Current state hidden → redirect"
-                    );
+                    const currentPath =
+                        decodeURIComponent(
+                            location.pathname
+                        );
 
-                    navigate(
-                        "/dashboard/states"
-                    );
+
+                    const statePath =
+                        `/dashboard/states/${updatedState.name}`;
+
+
+                    if (
+                        currentPath ===
+                        statePath
+                    ) {
+
+                        console.log(
+                            "Current state hidden → redirect"
+                        );
+
+
+                        navigate(
+                            "/dashboard/states"
+                        );
+
+                    }
 
                 }
 
-            }
-
-        };
+            };
 
 
         // =================================================
         // PLACE ADDED
         // =================================================
 
-        const handlePlaceAdded = (newPlace) => {
+        const handlePlaceAdded =
+            (newPlace) => {
 
-            console.log(
-                "Socket → placeAdded:",
-                newPlace
-            );
-
-            dispatch(
-                addPlaceRealtime(
+                console.log(
+                    "Socket → placeAdded:",
                     newPlace
-                )
-            );
+                );
 
-        };
+
+                dispatch(
+                    addPlaceRealtime(
+                        newPlace
+                    )
+                );
+
+            };
 
 
         // =================================================
         // PLACE UPDATED
         // =================================================
 
-        const handlePlaceUpdated = (data) => {
+        const handlePlaceUpdated =
+            (data) => {
 
-            console.log(
-                "Socket → placeUpdated:",
-                data
-            );
+                console.log(
+                    "Socket → placeUpdated:",
+                    data
+                );
 
-            dispatch(
-                updatePlaceRealtime(
-                    data.place
-                )
-            );
 
-        };
+                dispatch(
+                    updatePlaceRealtime(
+                        data.place
+                    )
+                );
+
+            };
 
 
         // =================================================
         // PLACE DELETED
         // =================================================
 
-        const handlePlaceDeleted = (deletedPlace) => {
+        const handlePlaceDeleted =
+            (deletedPlace) => {
 
-            console.log(
-                "Socket → placeDeleted:",
-                deletedPlace
-            );
+                console.log(
+                    "Socket → placeDeleted:",
+                    deletedPlace
+                );
 
-            dispatch(
-                deletePlaceRealtime(
-                    deletedPlace._id
-                )
-            );
 
-        };
+                dispatch(
+                    deletePlaceRealtime(
+                        deletedPlace._id
+                    )
+                );
+
+            };
 
 
         // =================================================
         // DRAFT ADDED
         // =================================================
 
-        const handleDraftAdded = (newDraft) => {
+        const handleDraftAdded =
+            (newDraft) => {
 
-            console.log(
-                "Socket → draftAdded:",
-                newDraft
-            );
+                console.log(
+                    "Socket → draftAdded:",
+                    newDraft
+                );
 
-            // We'll connect this to admin draft Redux
-            // after checking your admin data structure.
-
-        };
+            };
 
 
         // =================================================
@@ -325,19 +484,34 @@ function App() {
         // =================================================
 
         socket.on(
+            "userBlocked",
+            handleUserBlocked
+        );
+
+
+        socket.on(
+            "userUnblocked",
+            handleUserUnblocked
+        );
+
+
+        socket.on(
             "stateAdded",
             handleStateAdded
         );
+
 
         socket.on(
             "stateUpdated",
             handleStateUpdated
         );
 
+
         socket.on(
             "stateDeleted",
             handleStateDeleted
         );
+
 
         socket.on(
             "stateVisibilityUpdated",
@@ -350,10 +524,12 @@ function App() {
             handlePlaceAdded
         );
 
+
         socket.on(
             "placeUpdated",
             handlePlaceUpdated
         );
+
 
         socket.on(
             "placeDeleted",
@@ -374,19 +550,34 @@ function App() {
         return () => {
 
             socket.off(
+                "userBlocked",
+                handleUserBlocked
+            );
+
+
+            socket.off(
+                "userUnblocked",
+                handleUserUnblocked
+            );
+
+
+            socket.off(
                 "stateAdded",
                 handleStateAdded
             );
+
 
             socket.off(
                 "stateUpdated",
                 handleStateUpdated
             );
 
+
             socket.off(
                 "stateDeleted",
                 handleStateDeleted
             );
+
 
             socket.off(
                 "stateVisibilityUpdated",
@@ -399,10 +590,12 @@ function App() {
                 handlePlaceAdded
             );
 
+
             socket.off(
                 "placeUpdated",
                 handlePlaceUpdated
             );
+
 
             socket.off(
                 "placeDeleted",
@@ -420,13 +613,14 @@ function App() {
     }, [
         dispatch,
         location.pathname,
-        navigate
+        navigate,
+        user,
     ]);
 
 
-    // =========================================
+    // =====================================================
     // WAIT FOR AUTH CHECK
-    // =========================================
+    // =====================================================
 
     if (loading) {
 
@@ -435,9 +629,9 @@ function App() {
     }
 
 
-    // =========================================
+    // =====================================================
     // APP
-    // =========================================
+    // =====================================================
 
     return (
         <>
@@ -456,10 +650,11 @@ function App() {
             ================================= */}
 
             <main
-                className={`app-main ${isAuthPage
-                    ? "auth-main"
-                    : ""
-                    }`}
+                className={`app-main ${
+                    isAuthPage
+                        ? "auth-main"
+                        : ""
+                }`}
             >
 
                 <Routes>
@@ -488,12 +683,14 @@ function App() {
                         }
                     />
 
+
                     <Route
                         path="/signup"
                         element={
                             <Signup />
                         }
                     />
+
 
                     <Route
                         path="/verify-otp"
@@ -581,6 +778,7 @@ function App() {
                             }
                         />
 
+
                         <Route
                             path="places"
                             element={
@@ -588,12 +786,15 @@ function App() {
                             }
                         />
 
+
                         <Route
                             path="states"
                             element={
                                 <AdminStates />
                             }
                         />
+
+
                         <Route
                             path="users"
                             element={
@@ -630,7 +831,6 @@ function App() {
 
         </>
     );
-
 }
 
 

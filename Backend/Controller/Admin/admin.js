@@ -3,38 +3,57 @@ const State = require("../../Models/states");
 const User = require("../../Models/user");
 const DraftPlace = require("../../Models/draftPlace");
 
+const { getSocketIO } = require("../../Config/socket");
+
+
 // =====================================================
 // ADMIN DASHBOARD DATA
 // =====================================================
 
 async function getAdminData(req, res) {
     try {
-        const totalPlaces = await Famous.countDocuments();
-        const totalStates = await State.countDocuments();
-        const totalUsers = await User.countDocuments();
-        const totalDraft = await DraftPlace.countDocuments();
+        const totalPlaces =
+            await Famous.countDocuments();
+
+        const totalStates =
+            await State.countDocuments();
+
+        const totalUsers =
+            await User.countDocuments();
+
+        const totalDraft =
+            await DraftPlace.countDocuments();
+
 
         const places = await Famous.find()
             .populate("state_id", "name")
             .sort({ createdAt: -1 });
 
+
         const drafts = await DraftPlace.find()
             .populate("state_id", "name")
             .sort({ createdAt: -1 });
 
+
         const states = await State.find();
 
-        const featuredPlaces = await Famous.find({
-            featured: true,
-        })
-            .populate("state_id", "name")
-            .sort({ views: -1 });
 
-        const totalImages = places.reduce(
-            (total, place) =>
-                total + (place.photos?.length ?? 0),
-            0
-        );
+        const featuredPlaces =
+            await Famous.find({
+                featured: true,
+            })
+                .populate("state_id", "name")
+                .sort({ views: -1 });
+
+
+        const totalImages =
+            places.reduce(
+                (total, place) =>
+                    total +
+                    (place.photos?.length ?? 0),
+                0
+            );
+
 
         return res.status(200).json({
             status: true,
@@ -52,6 +71,7 @@ async function getAdminData(req, res) {
             drafts,
             featuredPlaces,
         });
+
     } catch (error) {
         console.log(error);
 
@@ -61,6 +81,7 @@ async function getAdminData(req, res) {
         });
     }
 }
+
 
 // =====================================================
 // STATE DATA
@@ -68,12 +89,14 @@ async function getAdminData(req, res) {
 
 async function getStateData(req, res) {
     try {
-        const states = await State.find();
+        const states =
+            await State.find();
 
         return res.status(200).json({
             status: true,
             states,
         });
+
     } catch (error) {
         console.log(error);
 
@@ -84,50 +107,80 @@ async function getStateData(req, res) {
     }
 }
 
+
 // =====================================================
 // GET ALL USERS
 // =====================================================
 
 async function getAdminUsers(req, res) {
     try {
-        const users = await User.find({
-            role: { $ne: "admin" },
-        })
-            .select("-password")
-            .populate("visitedStates", "name")
-            .populate(
-                "favoritePlaces",
-                "name title photos state_id"
-            )
-            .sort({ createdAt: -1 });
+        const users =
+            await User.find({
+                role: { $ne: "admin" },
+            })
+                .select("-password")
+                .populate(
+                    "visitedStates",
+                    "name"
+                )
+                .populate(
+                    "favoritePlaces",
+                    "name title photos state_id"
+                )
+                .sort({
+                    createdAt: -1,
+                });
+
 
         const now = new Date();
 
-        const totalUsers = users.length;
+        const totalUsers =
+            users.length;
 
-        const activeUsers = users.filter(
-            (user) =>
-                user.status !== "blocked"
-        ).length;
 
-        const blockedUsers = users.filter(
-            (user) =>
-                user.status === "blocked"
-        ).length;
+        const activeUsers =
+            users.filter(
+                (user) =>
+                    user.status !== "blocked"
+            ).length;
 
-        // New users = users created during last 30 days
-        const newUsers = users.filter((user) => {
-            const createdAt = new Date(user.createdAt);
 
-            const difference =
-                now.getTime() -
-                createdAt.getTime();
+        const blockedUsers =
+            users.filter(
+                (user) =>
+                    user.status === "blocked"
+            ).length;
 
-            const thirtyDays =
-                30 * 24 * 60 * 60 * 1000;
 
-            return difference <= thirtyDays;
-        }).length;
+        // =========================================
+        // NEW USERS
+        // LAST 30 DAYS
+        // =========================================
+
+        const newUsers =
+            users.filter((user) => {
+                const createdAt =
+                    new Date(
+                        user.createdAt
+                    );
+
+                const difference =
+                    now.getTime() -
+                    createdAt.getTime();
+
+                const thirtyDays =
+                    30 *
+                    24 *
+                    60 *
+                    60 *
+                    1000;
+
+                return (
+                    difference <=
+                    thirtyDays
+                );
+            }).length;
+
 
         return res.status(200).json({
             status: true,
@@ -141,15 +194,18 @@ async function getAdminUsers(req, res) {
 
             users,
         });
+
     } catch (error) {
         console.log(error);
 
         return res.status(500).json({
             status: false,
-            message: "Failed to fetch users",
+            message:
+                "Failed to fetch users",
         });
     }
 }
+
 
 // =====================================================
 // GET SINGLE USER
@@ -159,13 +215,19 @@ async function getAdminUser(req, res) {
     try {
         const { id } = req.params;
 
-        const user = await User.findById(id)
-            .select("-password")
-            .populate("visitedStates", "name")
-            .populate(
-                "favoritePlaces",
-                "name title photos state_id"
-            );
+
+        const user =
+            await User.findById(id)
+                .select("-password")
+                .populate(
+                    "visitedStates",
+                    "name"
+                )
+                .populate(
+                    "favoritePlaces",
+                    "name title photos state_id"
+                );
+
 
         if (!user) {
             return res.status(404).json({
@@ -174,19 +236,23 @@ async function getAdminUser(req, res) {
             });
         }
 
+
         return res.status(200).json({
             status: true,
             user,
         });
+
     } catch (error) {
         console.log(error);
 
         return res.status(500).json({
             status: false,
-            message: "Failed to fetch user",
+            message:
+                "Failed to fetch user",
         });
     }
 }
+
 
 // =====================================================
 // BLOCK / UNBLOCK USER
@@ -196,7 +262,10 @@ async function toggleUserStatus(req, res) {
     try {
         const { id } = req.params;
 
-        const user = await User.findById(id);
+
+        const user =
+            await User.findById(id);
+
 
         if (!user) {
             return res.status(404).json({
@@ -205,48 +274,156 @@ async function toggleUserStatus(req, res) {
             });
         }
 
+
+        // =========================================
+        // ADMIN CANNOT BE BLOCKED
+        // =========================================
+
         if (user.role === "admin") {
             return res.status(403).json({
                 status: false,
-                message: "Admin account cannot be blocked",
+                message:
+                    "Admin account cannot be blocked",
             });
         }
+
+
+        // =========================================
+        // TOGGLE STATUS
+        // =========================================
 
         user.status =
             user.status === "blocked"
                 ? "active"
                 : "blocked";
 
+
         await user.save();
+
+
+        // =========================================
+        // GET UPDATED USER
+        // =========================================
 
         const updatedUser =
             await User.findById(id)
                 .select("-password")
-                .populate("visitedStates", "name")
+                .populate(
+                    "visitedStates",
+                    "name"
+                )
                 .populate(
                     "favoritePlaces",
                     "name title photos state_id"
                 );
 
+
+        // =========================================
+        // REAL-TIME SOCKET EVENT
+        // =========================================
+
+        try {
+            const io = getSocketIO();
+
+
+            if (
+                user.status ===
+                "blocked"
+            ) {
+
+                // =================================
+                // USER BLOCKED
+                // =================================
+
+                io.emit(
+                    "userBlocked",
+                    {
+                        userId:
+                            user._id.toString(),
+
+                        name:
+                            user.name,
+
+                        email:
+                            user.email,
+
+                        status:
+                            user.status,
+                    }
+                );
+
+
+                console.log(
+                    "Socket → userBlocked:",
+                    user.email
+                );
+
+            } else {
+
+                // =================================
+                // USER UNBLOCKED
+                // =================================
+
+                io.emit(
+                    "userUnblocked",
+                    {
+                        userId:
+                            user._id.toString(),
+
+                        name:
+                            user.name,
+
+                        email:
+                            user.email,
+
+                        status:
+                            user.status,
+                    }
+                );
+
+
+                console.log(
+                    "Socket → userUnblocked:",
+                    user.email
+                );
+            }
+
+        } catch (socketError) {
+
+            console.log(
+                "Socket status event error:",
+                socketError.message
+            );
+        }
+
+
+        // =========================================
+        // RESPONSE
+        // =========================================
+
         return res.status(200).json({
             status: true,
 
             message:
-                user.status === "blocked"
+                user.status ===
+                "blocked"
                     ? "User blocked successfully"
                     : "User unblocked successfully",
 
             user: updatedUser,
         });
+
     } catch (error) {
         console.log(error);
 
         return res.status(500).json({
             status: false,
-            message: "Failed to update user status",
+            message:
+                "Failed to update user status",
         });
     }
 }
+
 
 // =====================================================
 // DELETE USER
@@ -256,7 +433,10 @@ async function deleteAdminUser(req, res) {
     try {
         const { id } = req.params;
 
-        const user = await User.findById(id);
+
+        const user =
+            await User.findById(id);
+
 
         if (!user) {
             return res.status(404).json({
@@ -265,52 +445,61 @@ async function deleteAdminUser(req, res) {
             });
         }
 
+
         if (user.role === "admin") {
             return res.status(403).json({
                 status: false,
-                message: "Admin account cannot be deleted",
+                message:
+                    "Admin account cannot be deleted",
             });
         }
 
+
         await User.findByIdAndDelete(id);
+
 
         return res.status(200).json({
             status: true,
-            message: "User deleted successfully",
+
+            message:
+                "User deleted successfully",
+
             userId: id,
         });
+
     } catch (error) {
         console.log(error);
 
         return res.status(500).json({
             status: false,
-            message: "Failed to delete user",
+            message:
+                "Failed to delete user",
         });
     }
 }
 
+
 // =====================================================
 // UPDATE LAST LOGIN
-// =====================================================
-//
-// This endpoint can be called after successful authentication.
-// It uses the logged-in user's id supplied by the request.
-//
 // =====================================================
 
 async function updateLastLogin(req, res) {
     try {
+
         const userId =
             req.user?._id ||
             req.user?.id ||
             req.body?.userId;
 
+
         if (!userId) {
             return res.status(401).json({
                 status: false,
-                message: "User not authenticated",
+                message:
+                    "User not authenticated",
             });
         }
+
 
         const user =
             await User.findByIdAndUpdate(
@@ -323,26 +512,37 @@ async function updateLastLogin(req, res) {
                 }
             ).select("-password");
 
+
         if (!user) {
             return res.status(404).json({
                 status: false,
-                message: "User not found",
+                message:
+                    "User not found",
             });
         }
 
+
         return res.status(200).json({
             status: true,
-            lastLogin: user.lastLogin,
+            lastLogin:
+                user.lastLogin,
         });
+
     } catch (error) {
         console.log(error);
 
         return res.status(500).json({
             status: false,
-            message: "Failed to update last login",
+            message:
+                "Failed to update last login",
         });
     }
 }
+
+
+// =====================================================
+// EXPORT
+// =====================================================
 
 module.exports = {
     getAdminData,
