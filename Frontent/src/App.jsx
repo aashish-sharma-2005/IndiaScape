@@ -40,6 +40,7 @@ import AdminRoute from "./Guards/AdminRoutes";
 
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
+import AdminUsers from "./component/Admin/AdminUsers";
 
 import {
     fetchStatesData,
@@ -591,6 +592,12 @@ function App() {
                             path="states"
                             element={
                                 <AdminStates />
+                            }
+                        />
+                        <Route
+                            path="users"
+                            element={
+                                <AdminUsers />
                             }
                         />
 
