@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-
 // =========================================
 // FETCH STATES DATA
 // =========================================
@@ -22,7 +21,6 @@ export const fetchStatesData = createAsyncThunk(
 
             const result = await response.json();
 
-
             if (response.status === 401) {
 
                 return rejectWithValue({
@@ -31,7 +29,6 @@ export const fetchStatesData = createAsyncThunk(
                 });
 
             }
-
 
             if (!response.ok || !result.status) {
 
@@ -45,12 +42,10 @@ export const fetchStatesData = createAsyncThunk(
 
             }
 
-
             return {
                 famous: result.places || [],
                 states: result.states || [],
             };
-
 
         } catch (error) {
 
@@ -65,7 +60,6 @@ export const fetchStatesData = createAsyncThunk(
     }
 );
 
-
 const statesSlice = createSlice({
 
     name: "states",
@@ -79,9 +73,7 @@ const statesSlice = createSlice({
 
     },
 
-
     reducers: {
-
 
         // =========================================
         // STATE ADDED
@@ -91,12 +83,19 @@ const statesSlice = createSlice({
 
             const newState = action.payload;
 
+            if (!newState?._id) {
+                return;
+            }
+
             const alreadyExists = state.states.some(
-                (item) => item._id === newState._id
+                (item) =>
+                    item._id === newState._id
             );
 
-
-            if (!alreadyExists && newState.visible !== false) {
+            if (
+                !alreadyExists &&
+                newState.visible !== false
+            ) {
 
                 state.states.push(newState);
 
@@ -113,11 +112,14 @@ const statesSlice = createSlice({
 
             const updatedState = action.payload;
 
+            if (!updatedState?._id) {
+                return;
+            }
+
             const index = state.states.findIndex(
                 (item) =>
                     item._id === updatedState._id
             );
-
 
             if (index !== -1) {
 
@@ -141,16 +143,11 @@ const statesSlice = createSlice({
                 action.payload?._id ||
                 action.payload;
 
-
             state.states =
                 state.states.filter(
                     (item) =>
                         item._id !== deletedStateId
                 );
-
-
-            // Also remove places belonging
-            // to the deleted state
 
             state.famous =
                 state.famous.filter(
@@ -170,21 +167,33 @@ const statesSlice = createSlice({
 
         },
 
+
+        // =========================================
         // REAL-TIME STATE VISIBILITY UPDATE
         // =========================================
 
-        updateStateVisibility: (state, action) => {
+        updateStateVisibility: (
+            state,
+            action
+        ) => {
 
-            const updatedState = action.payload;
+            const updatedState =
+                action.payload;
 
-            const index = state.states.findIndex(
-                (item) => item._id === updatedState._id
-            );
+            if (!updatedState?._id) {
+                return;
+            }
 
+            const index =
+                state.states.findIndex(
+                    (item) =>
+                        item._id ===
+                        updatedState._id
+                );
 
-            // =========================================
+            // =====================================
             // STATE ALREADY EXISTS
-            // =========================================
+            // =====================================
 
             if (index !== -1) {
 
@@ -194,17 +203,21 @@ const statesSlice = createSlice({
                 };
 
                 return;
+
             }
 
-
-            // =========================================
+            // =====================================
             // STATE DOES NOT EXIST
             // BUT ADMIN SHOWED IT
-            // =========================================
+            // =====================================
 
-            if (updatedState.visible === true) {
+            if (
+                updatedState.visible === true
+            ) {
 
-                state.states.push(updatedState);
+                state.states.push(
+                    updatedState
+                );
 
             }
 
@@ -215,19 +228,21 @@ const statesSlice = createSlice({
         // UPDATE STATE IMAGE FROM PLACE
         // =========================================
 
-        updateStateImage: (state, action) => {
+        updateStateImage: (
+            state,
+            action
+        ) => {
 
-            const updatedPlace = action.payload;
+            const updatedPlace =
+                action.payload;
 
             const stateId =
                 updatedPlace?.state_id?._id ||
                 updatedPlace?.state_id;
 
-
             if (!stateId) {
                 return;
             }
-
 
             const stateIndex =
                 state.states.findIndex(
@@ -235,14 +250,140 @@ const statesSlice = createSlice({
                         item._id === stateId
                 );
 
-
             if (stateIndex === -1) {
                 return;
             }
 
-
             state.states[stateIndex].photos =
                 updatedPlace.photos || [];
+
+        },
+
+
+        // =========================================
+        // PLACE UPDATED REALTIME
+        // =========================================
+
+        placeUpdatedRealtime: (
+            state,
+            action
+        ) => {
+
+            const updatedPlace =
+                action.payload;
+
+            if (!updatedPlace?._id) {
+                return;
+            }
+
+
+            // =====================================
+            // FIND EXISTING PLACE
+            // =====================================
+
+            const index =
+                state.famous.findIndex(
+                    (place) =>
+                        place._id ===
+                        updatedPlace._id
+                );
+
+
+            // =====================================
+            // PLACE EXISTS
+            // =====================================
+
+            if (index !== -1) {
+
+                const oldPlace =
+                    state.famous[index];
+
+
+                /*
+                 * Sometimes backend socket data
+                 * may contain state_id as an ObjectId
+                 * string instead of populated object.
+                 *
+                 * Keep old populated state_id if
+                 * updated socket data doesn't contain
+                 * the populated state object.
+                 */
+
+                const oldStateId =
+                    oldPlace?.state_id;
+
+                const newStateId =
+                    updatedPlace?.state_id;
+
+
+                let finalPlace = {
+                    ...oldPlace,
+                    ...updatedPlace,
+                };
+
+
+                if (
+                    newStateId &&
+                    typeof newStateId === "string" &&
+                    oldStateId &&
+                    typeof oldStateId === "object"
+                ) {
+
+                    finalPlace = {
+                        ...finalPlace,
+                        state_id: oldStateId,
+                    };
+
+                }
+
+
+                state.famous[index] =
+                    finalPlace;
+
+                return;
+
+            }
+
+
+            // =====================================
+            // PLACE NOT FOUND
+            // =====================================
+
+            /*
+             * This can happen when:
+             *
+             * - admin adds a place
+             * - user opened app before place existed
+             * - socket update reaches user
+             *
+             * Add it to famous list.
+             */
+
+            state.famous.push(
+                updatedPlace
+            );
+
+        },
+
+
+        // =========================================
+        // PLACE DELETED REALTIME
+        // =========================================
+
+        deletePlaceRealtime: (
+            state,
+            action
+        ) => {
+
+            const placeId =
+                action.payload?._id ||
+                action.payload;
+
+            state.famous =
+                state.famous.filter(
+                    (place) =>
+                        place._id !== placeId
+                );
 
         },
 
@@ -253,10 +394,9 @@ const statesSlice = createSlice({
 
         builder
 
-
-            // =========================================
+            // =====================================
             // FETCH PENDING
-            // =========================================
+            // =====================================
 
             .addCase(
                 fetchStatesData.pending,
@@ -269,9 +409,9 @@ const statesSlice = createSlice({
             )
 
 
-            // =========================================
+            // =====================================
             // FETCH SUCCESS
-            // =========================================
+            // =====================================
 
             .addCase(
                 fetchStatesData.fulfilled,
@@ -289,9 +429,9 @@ const statesSlice = createSlice({
             )
 
 
-            // =========================================
+            // =====================================
             // FETCH ERROR
-            // =========================================
+            // =====================================
 
             .addCase(
                 fetchStatesData.rejected,
@@ -310,14 +450,14 @@ const statesSlice = createSlice({
 
 });
 
-
 export const {
     addStateRealtime,
     updateState,
     deleteStateRealtime,
     updateStateVisibility,
     updateStateImage,
+    placeUpdatedRealtime,
+    deletePlaceRealtime,
 } = statesSlice.actions;
-
 
 export default statesSlice.reducer;

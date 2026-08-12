@@ -4,12 +4,7 @@ import socket from "./socket/socket";
 import { TopNavBar } from "./screen/Navbar/index";
 import { HomeHeroPage } from "./screen/HeroPage/index";
 
-import {
-    Routes,
-    Route,
-    useLocation,
-    useNavigate,
-} from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate, } from "react-router-dom";
 
 import { Login } from "./screen/Auth/Login";
 import { Signup } from "./screen/Auth/Signup";
@@ -22,7 +17,7 @@ import Admin from "./screen/Admin/index";
 import AdminPlaces from "./component/Admin/AdminPlaces";
 import AdminLayout from "./component/Admin/AdminLayout";
 import AdminStates from "./component/Admin/AdminStates";
-
+import SearchResults from "./screen/search/SearchResult";
 import { OneState } from "./screen/State/OneState";
 import { Details } from "./screen/Details";
 
@@ -673,8 +668,8 @@ function App() {
 
             <main
                 className={`app-main ${isAuthPage
-                        ? "auth-main"
-                        : ""
+                    ? "auth-main"
+                    : ""
                     }`}
             >
 
@@ -733,7 +728,14 @@ function App() {
                             </UserRoute>
                         }
                     />
-
+                    <Route
+                        path="/dashboard/search"
+                        element={
+                            <UserRoute>
+                                <SearchResults />
+                            </UserRoute>
+                        }
+                    />
 
                     <Route
                         path="/dashboard/states"

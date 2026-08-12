@@ -1,8 +1,31 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 
-import { logoutUser } from "../../store/loginSlice";
+import {
+    Link,
+    useLocation,
+    useNavigate
+} from "react-router-dom";
+
+import {
+    useDispatch,
+    useSelector
+} from "react-redux";
+
+import {
+    logoutUser
+} from "../../store/loginSlice";
+
+import {
+    Compass,
+    Map,
+    Landmark,
+    Heart,
+    Search,
+    UserCircle,
+    Menu,
+    X,
+    ChevronDown
+} from "lucide-react";
 
 import "./NavBar.css";
 
@@ -11,6 +34,7 @@ const NavBar = () => {
 
     const location = useLocation();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const {
         isLogin,
@@ -19,27 +43,71 @@ const NavBar = () => {
         (state) => state.loginReducer
     );
 
+
     const [dropdownOpen, setDropdownOpen] =
         useState(false);
+
+    const [mobileMenuOpen, setMobileMenuOpen] =
+        useState(false);
+
+    const [searchText, setSearchText] =
+        useState("");
+
 
     const path =
         location.pathname.toLowerCase();
 
 
     // =========================================
-    // ADMIN PAGES -> NO HEADER
+    // SEARCH
+    // =========================================
+
+    const handleSearch = (event) => {
+
+        event.preventDefault();
+
+        const query =
+            searchText.trim();
+
+        if (!query) {
+            return;
+        }
+
+        navigate(
+            `/dashboard/search?q=${encodeURIComponent(query)}`
+        );
+
+        setMobileMenuOpen(false);
+    };
+
+
+    // =========================================
+    // CLOSE MOBILE MENU
+    // =========================================
+
+    const closeMobileMenu = () => {
+
+        setMobileMenuOpen(false);
+
+    };
+
+
+    // =========================================
+    // ADMIN
     // =========================================
 
     if (
         user?.role === "admin" ||
         path.startsWith("/admin")
     ) {
+
         return null;
+
     }
 
 
     // =========================================
-    // PUBLIC HOME / HERO
+    // PUBLIC HOME
     // =========================================
 
     const isHeroPage =
@@ -51,25 +119,17 @@ const NavBar = () => {
 
         return (
 
-            <header className="site-header">
-
-                {/* =========================
-                    LOGO
-                ========================= */}
+            <header className="site-header public-header">
 
                 <Link
                     className="logo"
                     to="/"
                 >
-
-                    <Logo />
-
+                    <span className="logo-text">
+                        IndiaScape
+                    </span>
                 </Link>
 
-
-                {/* =========================
-                    NAVIGATION
-                ========================= */}
 
                 <nav className="header-nav">
 
@@ -98,10 +158,6 @@ const NavBar = () => {
 
                 </nav>
 
-
-                {/* =========================
-                    ACTIONS
-                ========================= */}
 
                 <div className="header-actions">
 
@@ -142,9 +198,9 @@ const NavBar = () => {
                     className="logo"
                     to="/"
                 >
-
-                    <Logo />
-
+                    <span className="logo-text">
+                        IndiaScape
+                    </span>
                 </Link>
 
 
@@ -181,9 +237,9 @@ const NavBar = () => {
                     className="logo"
                     to="/"
                 >
-
-                    <Logo />
-
+                    <span className="logo-text">
+                        IndiaScape
+                    </span>
                 </Link>
 
 
@@ -207,7 +263,7 @@ const NavBar = () => {
 
 
     // =========================================
-    // LOGGED-IN USER
+    // LOGGED IN USER
     // =========================================
 
     if (isLogin) {
@@ -216,187 +272,370 @@ const NavBar = () => {
 
             <header className="site-header user-header">
 
-                {/* =========================
-                    LOGO
-                ========================= */}
 
-                <Link
-                    className="logo"
-                    to="/dashboard"
-                >
+                {/* =================================
+                    TOP ROW
+                ================================= */}
 
-                    <Logo />
-
-                </Link>
+                <div className="navbar-main">
 
 
-                {/* =========================
-                    USER NAVIGATION
-                ========================= */}
-
-                <nav className="header-nav user-nav">
-
-                    {/* HOME */}
+                    {/* LOGO */}
 
                     <Link
-                        className={
-                            path === "/home" ||
-                            path === "/dashboard"
-                                ? "active"
-                                : ""
-                        }
+                        className="logo"
                         to="/dashboard"
+                        onClick={closeMobileMenu}
                     >
-                        Home
+
+                        <span className="logo-text">
+                            IndiaScape
+                        </span>
+
                     </Link>
 
 
-                    {/* STATES */}
+                    {/* =================================
+                        DESKTOP NAVIGATION
+                    ================================= */}
 
-                    <Link
-                        className={
-                            path.startsWith(
-                                "/dashboard/states"
-                            )
-                                ? "active"
-                                : ""
-                        }
-                        to="/dashboard/states"
+                    <nav className="header-nav user-nav">
+
+
+                        {/* EXPLORE */}
+
+                        <Link
+                            className={
+                                path === "/dashboard" ||
+                                path === "/home"
+                                    ? "active"
+                                    : ""
+                            }
+                            to="/dashboard"
+                        >
+
+                            <Compass className="nav-icon" />
+
+                            <span>
+                                Explore
+                            </span>
+
+                        </Link>
+
+
+                        {/* STATES */}
+
+                        <Link
+                            className={
+                                path.startsWith(
+                                    "/dashboard/states"
+                                )
+                                    ? "active"
+                                    : ""
+                            }
+                            to="/dashboard/states"
+                        >
+
+                            <Map className="nav-icon" />
+
+                            <span>
+                                States Map
+                            </span>
+
+                        </Link>
+
+
+                        {/* FAMOUS */}
+
+                        <Link
+                            className={
+                                path.startsWith(
+                                    "/dashboard/place"
+                                )
+                                    ? "active"
+                                    : ""
+                            }
+                            to="/dashboard"
+                        >
+
+                            <Landmark className="nav-icon" />
+
+                            <span>
+                                Famous
+                            </span>
+
+                        </Link>
+
+
+                        {/* FAVORITES */}
+
+                        <Link
+                            className={
+                                path.startsWith(
+                                    "/dashboard/favorites"
+                                )
+                                    ? "active"
+                                    : ""
+                            }
+                            to="/dashboard/favorites"
+                        >
+
+                            <Heart className="nav-icon" />
+
+                            <span>
+                                Favorites
+                            </span>
+
+                        </Link>
+
+                    </nav>
+
+
+                    {/* =================================
+                        SEARCH
+                    ================================= */}
+
+                    <form
+                        className="navbar-search"
+                        onSubmit={handleSearch}
                     >
-                        States
-                    </Link>
+
+                        <Search
+                            className="navbar-search-icon"
+                        />
+
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            value={searchText}
+                            onChange={(event) =>
+                                setSearchText(
+                                    event.target.value
+                                )
+                            }
+                        />
+
+                    </form>
 
 
-                    {/* FAMOUS PLACES */}
+                    {/* =================================
+                        USER
+                    ================================= */}
 
-                    <Link
-                        className={
-                            path.startsWith(
-                                "/dashboard/place"
-                            )
-                                ? "active"
-                                : ""
-                        }
-                        to="/dashboard"
-                    >
-                        Famous Places
-                    </Link>
+                    <div className="user-menu">
 
 
-                    {/* FAVORITES */}
+                        <button
+                            type="button"
+                            className="username-button"
+                            onClick={() =>
+                                setDropdownOpen(
+                                    (prev) => !prev
+                                )
+                            }
+                        >
 
-                    <Link
-                        className={
-                            path.startsWith(
-                                "/dashboard/favorites"
-                            )
-                                ? "active"
-                                : ""
-                        }
-                        to="/dashboard/favorites"
-                    >
-                        Favorite
-                    </Link>
+                            <UserCircle
+                                className="user-icon"
+                            />
 
-                </nav>
+                            <span className="username-text">
+                                {getUsername(user)}
+                            </span>
+
+                            <ChevronDown
+                                className={
+                                    `arrow ${
+                                        dropdownOpen
+                                            ? "rotate"
+                                            : ""
+                                    }`
+                                }
+                            />
+
+                        </button>
 
 
-                {/* =========================
-                    USER MENU
-                ========================= */}
+                        {dropdownOpen && (
 
-                <div className="user-menu">
+                            <div className="user-dropdown">
+
+                                <Link
+                                    to="/profile"
+                                    onClick={() =>
+                                        setDropdownOpen(
+                                            false
+                                        )
+                                    }
+                                >
+                                    Profile
+                                </Link>
+
+
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+
+                                        try {
+
+                                            await dispatch(
+                                                logoutUser()
+                                            ).unwrap();
+
+                                            setDropdownOpen(
+                                                false
+                                            );
+
+                                        } catch (error) {
+
+                                            console.log(
+                                                "Logout failed:",
+                                                error
+                                            );
+
+                                        }
+
+                                    }}
+                                >
+                                    Logout
+                                </button>
+
+                            </div>
+
+                        )}
+
+                    </div>
+
+
+                    {/* =================================
+                        MOBILE MENU BUTTON
+                    ================================= */}
 
                     <button
                         type="button"
-                        className="username-button"
+                        className="mobile-menu-button"
                         onClick={() =>
-                            setDropdownOpen(
+                            setMobileMenuOpen(
                                 (prev) => !prev
                             )
                         }
                     >
 
-                        <span className="user-avatar">
-
-                            {getUsername(user)
-                                .charAt(0)
-                                .toUpperCase()}
-
-                        </span>
-
-
-                        <span>
-                            {getUsername(user)}
-                        </span>
-
-
-                        <span
-                            className={
-                                `arrow ${
-                                    dropdownOpen
-                                        ? "rotate"
-                                        : ""
-                                }`
-                            }
-                        >
-                            ▼
-                        </span>
+                        {mobileMenuOpen ? (
+                            <X />
+                        ) : (
+                            <Menu />
+                        )}
 
                     </button>
 
-
-                    {/* =========================
-                        DROPDOWN
-                    ========================= */}
-
-                    {dropdownOpen && (
-
-                        <div className="user-dropdown">
-
-                            <Link
-                                to="/profile"
-                                onClick={() =>
-                                    setDropdownOpen(false)
-                                }
-                            >
-                                Profile
-                            </Link>
-
-
-                            <button
-                                type="button"
-                                onClick={async () => {
-
-                                    try {
-
-                                        await dispatch(
-                                            logoutUser()
-                                        ).unwrap();
-
-                                        setDropdownOpen(
-                                            false
-                                        );
-
-                                    } catch (error) {
-
-                                        console.log(
-                                            "Logout failed:",
-                                            error
-                                        );
-
-                                    }
-
-                                }}
-                            >
-                                Logout
-                            </button>
-
-                        </div>
-
-                    )}
-
                 </div>
+
+
+                {/* =================================
+                    MOBILE SEARCH
+                ================================= */}
+
+                <form
+                    className="mobile-search"
+                    onSubmit={handleSearch}
+                >
+
+                    <Search />
+
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchText}
+                        onChange={(event) =>
+                            setSearchText(
+                                event.target.value
+                            )
+                        }
+                    />
+
+                </form>
+
+
+                {/* =================================
+                    MOBILE NAVIGATION
+                ================================= */}
+
+                {mobileMenuOpen && (
+
+                    <nav className="mobile-nav">
+
+
+                        <Link
+                            className={
+                                path === "/dashboard"
+                                    ? "active"
+                                    : ""
+                            }
+                            to="/dashboard"
+                            onClick={closeMobileMenu}
+                        >
+
+                            <Compass />
+
+                            <span>
+                                Explore
+                            </span>
+
+                        </Link>
+
+
+                        <Link
+                            className={
+                                path.startsWith(
+                                    "/dashboard/states"
+                                )
+                                    ? "active"
+                                    : ""
+                            }
+                            to="/dashboard/states"
+                            onClick={closeMobileMenu}
+                        >
+
+                            <Map />
+
+                            <span>
+                                States Map
+                            </span>
+
+                        </Link>
+
+
+                        <Link
+                            to="/dashboard"
+                            onClick={closeMobileMenu}
+                        >
+
+                            <Landmark />
+
+                            <span>
+                                Famous
+                            </span>
+
+                        </Link>
+
+
+                        <Link
+                            to="/dashboard/favorites"
+                            onClick={closeMobileMenu}
+                        >
+
+                            <Heart />
+
+                            <span>
+                                Favorites
+                            </span>
+
+                        </Link>
+
+                    </nav>
+
+                )}
 
             </header>
 
@@ -418,7 +657,9 @@ const NavBar = () => {
                 to="/"
             >
 
-                <Logo />
+                <span className="logo-text">
+                    IndiaScape
+                </span>
 
             </Link>
 
@@ -432,6 +673,7 @@ const NavBar = () => {
                     Login
                 </Link>
 
+
                 <Link
                     to="/signup"
                     className="header-signup"
@@ -442,34 +684,6 @@ const NavBar = () => {
             </div>
 
         </header>
-
-    );
-
-};
-
-
-// =========================================
-// LOGO
-// =========================================
-
-const Logo = () => {
-
-    return (
-
-        <>
-            <span className="logo-icon">
-
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-
-            </span>
-
-            <span className="logo-text">
-                IndiaScape
-            </span>
-        </>
 
     );
 

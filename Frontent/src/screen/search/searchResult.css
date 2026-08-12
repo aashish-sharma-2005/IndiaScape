@@ -1,0 +1,406 @@
+/* =====================================================
+   INDIA SCAPE — SEARCH PAGE
+===================================================== */
+
+.search-page {
+
+    min-height: calc(100vh - 140px);
+
+    padding:
+        45px
+        6%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc,
+            #eef2f7
+        );
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.search-page-header {
+
+    margin-bottom: 35px;
+
+}
+
+
+.search-page-header span {
+
+    color: #777;
+
+    font-size: 14px;
+
+}
+
+
+.search-page-header h1 {
+
+    margin:
+        5px
+        0
+        8px;
+
+    font-size: 32px;
+
+    font-weight: 700;
+
+    color: #172033;
+
+}
+
+
+.search-page-header p {
+
+    margin: 0;
+
+    color: #777;
+
+}
+
+
+/* =====================================================
+   RESULTS GRID
+===================================================== */
+
+.search-results-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                280px,
+                1fr
+            )
+        );
+
+    gap: 25px;
+
+}
+
+
+/* =====================================================
+   RESULT CARD
+===================================================== */
+
+.search-result-card {
+
+    display: block;
+
+    overflow: hidden;
+
+    background: #fff;
+
+    border-radius: 18px;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    box-shadow:
+        0 8px 25px
+        rgba(
+            0,
+            0,
+            0,
+            0.07
+        );
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+
+}
+
+
+.search-result-card:hover {
+
+    transform:
+        translateY(-6px);
+
+    box-shadow:
+        0 15px 35px
+        rgba(
+            0,
+            0,
+            0,
+            0.12
+        );
+
+}
+
+
+/* =====================================================
+   IMAGE
+===================================================== */
+
+.search-result-image {
+
+    width: 100%;
+
+    height: 210px;
+
+    overflow: hidden;
+
+    background: #e9edf2;
+
+}
+
+
+.search-result-image img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.35s ease;
+
+}
+
+
+.search-result-card:hover
+.search-result-image img {
+
+    transform:
+        scale(1.06);
+
+}
+
+
+.search-result-no-image {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #888;
+
+    font-weight: 600;
+
+}
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.search-result-content {
+
+    padding: 20px;
+
+}
+
+
+.search-result-content h3 {
+
+    margin:
+        0
+        0
+        8px;
+
+    color: #172033;
+
+    font-size: 21px;
+
+}
+
+
+.search-result-state {
+
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: #777;
+
+    font-size: 14px;
+
+}
+
+
+.search-result-title {
+
+    margin:
+        8px
+        0;
+
+    color: #333;
+
+    font-weight: 600;
+
+}
+
+
+.search-result-description {
+
+    margin: 8px 0 0;
+
+    color: #777;
+
+    line-height: 1.5;
+
+    font-size: 14px;
+
+}
+
+
+/* =====================================================
+   EMPTY / NO RESULTS
+===================================================== */
+
+.search-empty,
+.search-no-results {
+
+    min-height: 55vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+}
+
+
+.search-empty-icon,
+.search-no-results-icon {
+
+    width: 70px;
+
+    height: 70px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 20px;
+
+    border-radius: 50%;
+
+    background: #fff;
+
+    box-shadow:
+        0 8px 25px
+        rgba(
+            0,
+            0,
+            0,
+            0.08
+        );
+
+    font-size: 28px;
+
+}
+
+
+.search-empty h2,
+.search-no-results h2 {
+
+    margin: 0 0 10px;
+
+    color: #172033;
+
+}
+
+
+.search-empty p,
+.search-no-results p {
+
+    margin: 0;
+
+    color: #777;
+
+}
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+.search-back-button {
+
+    margin-top: 22px;
+
+    padding:
+        11px
+        20px;
+
+    border-radius: 10px;
+
+    background: #172033;
+
+    color: #fff;
+
+    text-decoration: none;
+
+    font-weight: 600;
+
+    transition:
+        transform 0.2s ease;
+
+}
+
+
+.search-back-button:hover {
+
+    transform:
+        translateY(-2px);
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (
+    max-width: 768px
+) {
+
+    .search-page {
+
+        padding:
+            30px
+            20px;
+
+    }
+
+
+    .search-page-header h1 {
+
+        font-size: 26px;
+
+    }
+
+
+    .search-results-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+}

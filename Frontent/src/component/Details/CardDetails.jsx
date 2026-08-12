@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 
 import { updateUser } from "../../store/loginSlice";
 
-
 export function CardDetails() {
 
     const { id } = useParams();
@@ -19,7 +18,8 @@ export function CardDetails() {
     const [loading, setLoading] = useState(true);
 
     const [isFavorite, setIsFavorite] = useState(false);
-    const [favoriteLoading, setFavoriteLoading] = useState(false);
+    const [favoriteLoading, setFavoriteLoading] =
+        useState(false);
 
 
     // =========================================
@@ -32,6 +32,8 @@ export function CardDetails() {
 
             try {
 
+                setLoading(true);
+
                 const response = await fetch(
                     `http://localhost:3000/dashboard/place/${id}`,
                     {
@@ -39,17 +41,27 @@ export function CardDetails() {
                     }
                 );
 
-                const result = await response.json();
+                const result =
+                    await response.json();
 
                 if (result.status) {
 
                     setData(result.place);
 
+                } else {
+
+                    setData(null);
+
                 }
 
             } catch (error) {
 
-                console.log(error);
+                console.log(
+                    "Get place error:",
+                    error
+                );
+
+                setData(null);
 
             } finally {
 
@@ -60,6 +72,131 @@ export function CardDetails() {
         };
 
         getPlace();
+
+    }, [id]);
+
+
+    // =========================================
+    // REALTIME PLACE UPDATE
+    // =========================================
+
+    useEffect(() => {
+
+        const handlePlaceUpdated =
+            (payload) => {
+
+                /*
+                 * Backend sends:
+                 *
+                 * {
+                 *    place,
+                 *    changeType
+                 * }
+                 */
+
+                const updatedPlace =
+                    payload?.place || payload;
+
+
+                if (!updatedPlace?._id) {
+                    return;
+                }
+
+
+                // =================================
+                // ONLY UPDATE CURRENT PLACE
+                // =================================
+
+                if (
+                    updatedPlace._id.toString() !==
+                    id.toString()
+                ) {
+
+                    return;
+
+                }
+
+
+                console.log(
+                    "Place updated from server:",
+                    updatedPlace
+                );
+
+
+                // =================================
+                // UPDATE DETAILS
+                // =================================
+
+                setData(
+                    (previousPlace) => {
+
+                        if (!previousPlace) {
+
+                            return updatedPlace;
+
+                        }
+
+
+                        /*
+                         * Preserve old populated
+                         * state_id if backend sends
+                         * only ObjectId.
+                         */
+
+                        let finalPlace = {
+                            ...previousPlace,
+                            ...updatedPlace,
+                        };
+
+
+                        if (
+                            typeof updatedPlace.state_id ===
+                                "string" &&
+                            previousPlace.state_id &&
+                            typeof previousPlace.state_id ===
+                                "object"
+                        ) {
+
+                            finalPlace = {
+                                ...finalPlace,
+                                state_id:
+                                    previousPlace.state_id,
+                            };
+
+                        }
+
+
+                        return finalPlace;
+
+                    }
+                );
+
+
+                toast.info(
+                    "Place details updated"
+                );
+
+            };
+
+
+        socket.on(
+            "placeUpdated",
+            handlePlaceUpdated
+        );
+
+
+        // =========================================
+        // CLEANUP
+        // =========================================
+
+        return () => {
+
+            socket.off(
+                "placeUpdated",
+                handlePlaceUpdated
+            );
+
+        };
 
     }, [id]);
 
@@ -81,26 +218,34 @@ export function CardDetails() {
                     }
                 );
 
-                const result = await response.json();
+                const result =
+                    await response.json();
 
                 if (result.status) {
 
                     const favoritePlaces =
-                        result.user.favoritePlaces || [];
+                        result.user.favoritePlaces ||
+                        [];
 
                     const exists =
                         favoritePlaces.some(
                             (placeId) =>
-                                placeId.toString() === id
+                                placeId.toString() ===
+                                id.toString()
                         );
 
-                    setIsFavorite(exists);
+                    setIsFavorite(
+                        exists
+                    );
 
                 }
 
             } catch (error) {
 
-                console.log(error);
+                console.log(
+                    "Get user error:",
+                    error
+                );
 
             }
 
@@ -117,7 +262,9 @@ export function CardDetails() {
 
     const handleFavorite = async () => {
 
-        if (favoriteLoading) return;
+        if (favoriteLoading) {
+            return;
+        }
 
         setFavoriteLoading(true);
 
@@ -128,31 +275,36 @@ export function CardDetails() {
                 {
                     method: "POST",
                     credentials: "include",
+
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type":
+                            "application/json"
                     },
+
                     body: JSON.stringify({
                         placeId: id
                     })
                 }
             );
 
-            const result = await response.json();
+            const result =
+                await response.json();
 
 
-            // =========================================
+            // =================================
             // SUCCESS
-            // =========================================
+            // =================================
 
             if (result.status) {
 
-                // Update local favorite button
-                setIsFavorite(result.favorite);
+                setIsFavorite(
+                    result.favorite
+                );
 
 
-                // =========================================
+                // =================================
                 // UPDATE REDUX USER
-                // =========================================
+                // =================================
 
                 dispatch(
                     updateUser({
@@ -273,8 +425,12 @@ export function CardDetails() {
         <Details
             data={data}
             isFavorite={isFavorite}
-            favoriteLoading={favoriteLoading}
-            onFavorite={handleFavorite}
+            favoriteLoading={
+                favoriteLoading
+            }
+            onFavorite={
+                handleFavorite
+            }
         />
 
     );
